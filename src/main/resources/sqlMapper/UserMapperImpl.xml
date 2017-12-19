@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.minibox.dao.UserMapper">
+    <resultMap id="user" type="com.minibox.po.User">
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="username"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="password" column="password"/>
+        <result property="sex" column="sex" />
+        <result property="email" column="email"/>
+        <result property="image" column="image"/>
+        <result property="trueName" column="true_name"/>
+        <result property="taken" column="taken"/>
+        <result property="credibility" column="credibility"/>
+        <result property="useTime" column="use_time"/>
+    </resultMap>
+
+    <resultMap id="userDto" type="com.minibox.dto.UserDto">
+        <id property="userId" column="user_id"/>
+        <result property="userName" column="username"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="sex" column="sex" jdbcType="CHAR"/>
+        <result property="email" column="email"/>
+        <result property="image" column="image"/>
+        <result property="trueName" column="trueName"/>
+        <result property="taken" column="taken"/>
+        <result property="credibility" column="credibility"/>
+        <result property="useTime" column="use_time"/>
+    </resultMap>
+
+    <sql id="userDto_column">
+        user_id,username,phone_number,sex,email,image,true_name,taken,credibility,use_time
+    </sql>
+
+    <sql id="user_column">
+        user_id,userName,password,phone_number,sex,email,image,true_name,taken,credibility,use_time
+    </sql>
+
+    <insert id="insertUser" parameterType="com.minibox.po.User" keyColumn="user_id" useGeneratedKeys="true">
+        INSERT INTO user_info(username,password,phone_number,sex,email,credibility,use_time) VALUES (#{userName},#{password},#{phoneNumber},#{sex},#{email},#{credibility},#{useTime})
+    </insert>
+
+    <select id="findUserByPhoneNumber" parameterType="java.lang.String" resultMap="user">
+        SELECT <include refid="user_column"/>
+        from user_info WHERE phone_number=#{phoneNumber}
+    </select>
+
+    <select id="findUserByUserNameAndPassword" resultMap="userDto">
+        SELECT <include refid="userDto_column" />
+         FROM user_info WHERE username=#{userName} AND password=#{password}
+    </select>
+
+    <select id="findUserByUserId" parameterType="java.lang.Integer" resultMap="userDto">
+        SELECT <include refid="userDto_column"/>
+        FROM user_info WHERE user_id=#{userId}
+    </select>
+
+    <update id="updateUser" parameterType="com.minibox.po.User">
+        UPDATE user_info
+        <set>
+            <if test="userName != null">
+                username=#{userName},
+            </if>
+            <if test="phoneNumber!=null">
+                phone_number=#{phoneNumber},
+            </if>
+            <if test="sex!=null">
+                sex=#{sex},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="trueName!=null">
+                true_name=#{trueName}
+            </if>
+        </set>
+        WHERE user_id=#{userId}
+    </update>
+
+    <update id="updateUseTime">
+        UPDATE user_info SET use_time=use_time+1 WHERE user_id=
+    </update>
+
+    <select id="findUserByPhoneNumberAndPassword" resultMap="userDto">
+        SELECT * from user_info WHERE phone_number=#{phoneNumber} and password=#{password}
+    </select>
+
+    <select id="findUserByUserName" resultMap="userDto">
+        SELECT <include refid="userDto_column"/> from user_info WHERE username=#{userName}
+    </select>
+
+    <update id="updateAvatar">
+        UPDATE user_info set image=#{avatar} WHERE user_id=#{userId}
+    </update>
+
+    <update id="updatePassword" parameterType="java.lang.String">
+        UPDATE user_info SET password=#{newPassword} WHERE user_id=#{userId}
+    </update>
+
+    <update id="updateTaken">
+        UPDATE user_info SET taken=#{taken} WHERE user_id=#{userId}
+    </update>
+
+    <update id="updateUserCredibility">
+        update user_info set credibility=credibility+5 where
+        (select count(reservation_id) from reservation_info where reservation_info.user_id=user_info.user_id
+        and open_time>Date_add(now(), interval '-7' DAY) and exp_flag=1)=0
+    </update>
+</mapper>

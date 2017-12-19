@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.minibox.dao.BoxMapper">
+    <resultMap id="box" type="com.minibox.po.Box">
+        <id property="boxId" column="box_id"/>
+        <result property="boxSize" column="box_size"/>
+        <result property="boxStatus" column="box_status"/>
+        <result property="groupId" column="group_id"/>
+    </resultMap>
+
+    <resultMap id="group" type="com.minibox.po.GroupPo">
+        <id property="groupId" column="group_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="empty" column="empty"/>
+        <result property="lng" column="lng"/>
+        <result property="lat" column="lat"/>
+        <result property="position" column="position"/>
+    </resultMap>
+
+    <resultMap id="order" type="com.minibox.po.Order">
+        <id property="orderId" column="order_id"/>
+        <result property="userName" column="username"/>
+        <result property="groupId" column="group_id"/>
+        <result property="boxId" column="box_id"/>
+        <result property="orderTime" column="order_time" jdbcType="TIMESTAMP" javaType="java.lang.String"/>
+        <result property="delFlag" column="del_flag" javaType="java.lang.Integer"/>
+    </resultMap>
+
+    <sql id="order_column">
+        username,group_id,box_id,order_time
+    </sql>
+
+    <select id="findGroupsByDestination" parameterType="java.lang.String" resultMap="group">
+        SELECT * FROM group_info WHERE position LIKE CONCAT(CONCAT('%',#{destination}),'%')
+    </select>
+
+    <update id="reduceGroupBoxNum">
+        UPDATE group_info set empty=empty-1 WHERE position=#{position}
+    </update>
+
+    <update id="addGroupBoxNum" parameterType="java.lang.Integer">
+        UPDATE group_info SET empty=empty+#{boxNum} WHERE group_id=#{groupId}
+    </update>
+    
+    <insert id="insertOrderByAllParemater" parameterType="com.minibox.po.Order">
+        INSERT into order_info (<include refid="order_column"/>)
+        VALUES (#{userName},#{groupId},#{boxId},now())
+    </insert>
+
+    <select id="findOrderByOrderId" parameterType="java.lang.Integer" resultMap="order">
+        SELECT * FROM order_info WHERE order_id=#{orderId}
+    </select>
+
+    <select id="findBoxByBoxId" parameterType="java.lang.Integer" resultMap="box">
+        SELECT * FROM box_info WHERE box_id=#{boxId}
+    </select>
+
+    <select id="findBoxes" parameterType="java.lang.String" resultMap="box">
+        SELECT * from box_info WHERE box_id IN (SELECT box_id from order_info where username=#{userName})
+    </select>
+
+    <select id="findEmptyBoxes" resultMap="box">
+        SELECT * from box_info WHERE group_id=(SELECT group_id FROM group_info WHERE position=#{position}) AND box_status='0'
+        AND box_size=#{boxSize}
+    </select>
+
+    <select id="findBoxesByGroupId" parameterType="java.lang.Integer" resultMap="box">
+        SELECT * FROM box_info WHERE group_id=#{groupId}
+    </select>
+
+    <insert id="insertOrder">
+        INSERT INTO order_info(username,group_id,box_id,order_time) VALUES (#{userName},#{groupId},#{boxId},now())
+    </insert>
+
+    <insert id="insertSaleInfo" parameterType="com.minibox.po.Sale" >
+        INSERT INTO sale_info(username,box_id,group_id,pay_time,order_time,cost) VALUES (#{userName},#{boxId},#{groupId},now(),#{orderTime},#{cost})
+    </insert>
+
+    <update id="removeOrder" parameterType="java.lang.Integer">
+       UPDATE order_info SET del_flag='1' WHERE order_id=#{orderId}
+    </update>
+
+    <update id="updateBoxStatus" parameterType="java.lang.Integer">
+         UPDATE box_info set box_status=
+ case
+     when box_status=1 then '0'
+     when box_status=0 then '1'
+ end
+ where box_id=#{boxId}
+    </update>
+
+    <select id="findGroupByPosition" parameterType="java.lang.String" resultMap="group">
+        SELECT * FROM group_info WHERE position=#{position}
+    </select>
+</mapper>

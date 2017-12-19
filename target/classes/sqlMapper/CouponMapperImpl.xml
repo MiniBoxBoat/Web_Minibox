@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.minibox.dao.CouponMapper">
+    <resultMap id="coupon" type="com.minibox.po.Coupon">
+        <id property="couponId" column="coupon_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="money" column="money"/>
+        <result property="deadlineTime" column="deadline_time" jdbcType="TIMESTAMP" javaType="java.lang.String"/>
+    </resultMap>
+
+    <insert id="insertCoupon" parameterType="com.minibox.po.Coupon">
+        INSERT INTO coupon(user_id,money,deadline_time) VALUES (#{userId},#{money, javaType=DOUBLE},#{deadlineTime})
+    </insert>
+
+    <update id="removeCoupon" parameterType="java.lang.Integer">
+        UPDATE coupon SET del_flag='1' WHERE coupon_id=#{couponId}
+    </update>
+
+    <select id="findCouponsByUserId" parameterType="java.lang.Integer" resultMap="coupon">
+        SELECT * FROM coupon WHERE user_id=#{userId}
+    </select>
+
+</mapper>
