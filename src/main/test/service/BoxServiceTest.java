@@ -22,13 +22,6 @@ public class BoxServiceTest {
 
     @Test
     public void getGroupByDestinationTest(){
-        List<GroupVo> groupVos = boxService.getGroupByDestination("南岸", 106.615554,29.53893);
-        for (GroupVo groupVo : groupVos){
-            System.out.println(groupVo.getIsNear());
-            if (groupVo.getIsNear() == 1){
-                System.out.println(groupVo.getPosition());
-            }
-        }
     }
 
     @Test

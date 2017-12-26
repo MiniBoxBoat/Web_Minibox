@@ -28,7 +28,6 @@ public class CouponController {
         if (!couponService.addCoupon(userId, money, deadlineTime)){
             throw new Exception();
         }
-
         map = MapUtil.toMap(200, "操作成功", null);
         JsonUtil.toJSON(map);
         } catch (Exception e) {

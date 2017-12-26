@@ -79,7 +79,7 @@
     </update>
 
     <update id="updateUseTime">
-        UPDATE user_info SET use_time=use_time+1 WHERE user_id=
+        UPDATE user_info SET use_time=use_time+1 WHERE user_id=#{userId}
     </update>
 
     <select id="findUserByPhoneNumberAndPassword" resultMap="userDto">

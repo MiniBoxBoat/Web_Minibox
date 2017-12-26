@@ -54,7 +54,6 @@ public class ReservationController {
             map = MapUtil.toMap(500, "服务器错误", null);
             JsonUtil.toJSON(map);
         }
-
     }
 
     @RequestMapping(value = "/endReserve.do", method = RequestMethod.POST)

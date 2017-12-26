@@ -17,6 +17,7 @@
     <context:annotation-config/>
     <tx:annotation-driven proxy-target-class="true"/>
     <task:annotation-driven/>
+    <mvc:default-servlet-handler />
     <mvc:annotation-driven/>
     <context:property-placeholder location="classpath:mysql.properties"/>
     <bean name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">

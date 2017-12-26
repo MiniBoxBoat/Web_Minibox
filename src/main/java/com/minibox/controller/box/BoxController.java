@@ -1,11 +1,13 @@
 package com.minibox.controller.box;
 
 import com.minibox.exception.BoxIsBusyException;
+import com.minibox.exception.ParameterException;
 import com.minibox.exception.TakenVirifyException;
 import com.minibox.po.Box;
 import com.minibox.service.box.BoxService;
 import com.minibox.service.user.UserService;
 import com.minibox.vo.GroupVo;
+import org.aspectj.weaver.ast.Test;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,6 +15,7 @@ import util.JsonUtil;
 import util.MapUtil;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -30,12 +33,10 @@ public class BoxController {
     UserService userService;
 
     @RequestMapping(value = "/showBoxGroup.do", method = RequestMethod.POST)
-    public void showBoxGroup(String destination, double lng, double lat) {
+    public void showBoxGroup(String destination) {
         Map map;
         try {
-
-
-            List<GroupVo> groupVos = boxService.getGroupByDestination(destination, lng, lat);
+            List<GroupVo> groupVos = boxService.getGroupByDestination(destination);
             if (groupVos == null) {
                 throw new Exception();
             }
@@ -49,19 +50,21 @@ public class BoxController {
 
 
     @RequestMapping(value = "/order.do", method = RequestMethod.POST)
-    public void order(String userName, int groupId, int boxId, String taken) {
+    public void order(String userName, int groupId, String boxSize, String taken) {
         Map map;
         try {
-            if (!boxService.addOrder(userName, groupId, boxId, taken)) {
+            Integer boxId = boxService.addOrder(userName, groupId, boxSize, taken);
+            if (boxId == 0) {
                 throw new Exception();
             }
-            map = MapUtil.toMap(200, "数据存储成功", null);
+            map = MapUtil.toMap(200, "数据存储成功", boxId);
             JsonUtil.toJSON(map);
         } catch (TakenVirifyException e) {
             e.printStackTrace();
             map = MapUtil.toMap(401, e.getMessage(), null);
             JsonUtil.toJSON(map);
-        } catch (BoxIsBusyException e) {
+        } catch (BoxIsBusyException | ParameterException e) {
+            e.printStackTrace();
             map = MapUtil.toMap(400, e.getMessage(), null);
             JsonUtil.toJSON(map);
         } catch (Exception e) {
@@ -91,7 +94,6 @@ public class BoxController {
     public void showUserBoxes(String userName) {
         Map map;
         try {
-
             List<Box> boxes = boxService.getBoxes(userName);
             if (boxes == null) {
                 throw new Exception();
@@ -118,5 +120,10 @@ public class BoxController {
             map = MapUtil.toMap(500, "服务器错误", null);
             JsonUtil.toJSON(map);
         }
+    }
+
+    @RequestMapping("test.do")
+    public void test(HttpServletRequest request){
+        System.out.println(request.getServletContext().getRealPath("images"));
     }
 }

@@ -6,8 +6,10 @@ import com.minibox.exception.*;
 import com.minibox.po.User;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import org.springframework.web.context.support.HttpRequestHandlerServlet;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 public interface UserService {
 
@@ -54,7 +56,7 @@ public interface UserService {
      * @param userId 用户Id
      * @return 是否修改成功
      */
-    boolean updateUserAvatar(String avatar, int userId);
+    boolean updateUserAvatar(HttpServletRequest request, CommonsMultipartFile file, int userId) throws IOException;
 
     /**
      * 修改用户头像
@@ -63,6 +65,13 @@ public interface UserService {
      * @return 是否修改成功
      */
     boolean updatePassword(String newPassword, int userId,String taken) throws ParameterException, TakenVirifyException;
+
+    /**
+     * 用户修改头像时需要把上一个头像的文件删除
+     * @param userId
+     * @return
+     */
+    boolean deleteAvatarFile(int userId, String parentPath) throws IOException;
 
     /**
      * 验证taken

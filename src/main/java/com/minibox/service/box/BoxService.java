@@ -1,6 +1,7 @@
 package com.minibox.service.box;
 
 import com.minibox.exception.BoxIsBusyException;
+import com.minibox.exception.ParameterException;
 import com.minibox.exception.RollbackException;
 import com.minibox.exception.TakenVirifyException;
 import com.minibox.po.Box;
@@ -17,7 +18,7 @@ public interface BoxService {
      * @param lat 当前位置纬度
      * @return 存放点
      */
-    List<GroupVo> getGroupByDestination(String destination, double lng, double lat);
+    List<GroupVo> getGroupByDestination(String destination);
 
     /**
      * 保存订单
@@ -26,7 +27,7 @@ public interface BoxService {
      * @param boxId boxId
      * @return 是否下单成功
      */
-    boolean addOrder(String userName, int groupId, int boxId, String taken) throws BoxIsBusyException, TakenVirifyException, RollbackException;
+    int addOrder(String userName, int groupId, String size, String taken) throws BoxIsBusyException, TakenVirifyException, RollbackException, ParameterException;
 
     /**
      *保存销售信息

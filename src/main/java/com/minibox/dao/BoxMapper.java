@@ -91,6 +91,20 @@ public interface BoxMapper {
     List<Box> findBoxes(String userName);
 
     /**
+     * 得到指定存放点的空小箱子
+     * @param groupId
+     * @return
+     */
+    List<Box> findEmptySmallBox(int groupId);
+
+     /**
+     * 得到指定存放点的空大箱子
+     * @param groupId
+     * @return
+     */
+    List<Box> findEmptyLargeBox(int groupId);
+
+    /**
      * 通过存放点id得到存放点的所有箱子
      * @param groupId 存放点id
      * @return 存放点的所有箱子

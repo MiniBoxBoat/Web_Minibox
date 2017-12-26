@@ -7,7 +7,9 @@ import com.minibox.dto.UserDto;
 import com.minibox.exception.*;
 import com.minibox.po.User;
 import com.minibox.service.user.UserService;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import util.FormatUtil;
 import util.JavaWebTaken;
 import util.RamdomNumberUtil;
@@ -15,6 +17,11 @@ import util.Sms;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,8 +122,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUserAvatar(String avatar, int userId) {
-        return userMapper.updateAvatar(avatar, userId);
+    public boolean updateUserAvatar(HttpServletRequest request, CommonsMultipartFile file, int userId) throws IOException {
+        String path = request.getServletContext().getRealPath("/images/");
+        String fileName = System.currentTimeMillis() + file.getOriginalFilename();
+        File file1 = new File(path, fileName);
+        FileUtils.writeByteArrayToFile(file1, file.getBytes());
+        while(!file1.exists()){}
+        deleteAvatarFile(userId,path);
+        String avatarUrl = "http://box.jay86.com:8080/minibox/images/" + fileName;
+        return userMapper.updateAvatar(avatarUrl, userId);
+    }
+
+    @Override
+    public boolean deleteAvatarFile(int userId, String parantPath) throws IOException {
+        UserDto user = userMapper.findUserByUserId(userId);
+        String oldAvatarUrl = user.getImage();
+        String[] strs = oldAvatarUrl.split("/");
+        String oldAvatarFileName = strs[(strs.length-1)];
+        Path path = Paths.get(parantPath, oldAvatarFileName);
+        return Files.deleteIfExists(path);
     }
 
     @Override

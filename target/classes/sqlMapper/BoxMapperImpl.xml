@@ -60,6 +60,14 @@
         SELECT * from box_info WHERE box_id IN (SELECT box_id from order_info where username=#{userName})
     </select>
 
+    <select id="findEmptySmallBox" parameterType="java.lang.Integer" resultMap="box">
+        SELECT * from box_info WHERE box_size='小' AND group_id=#{groupId} AND box_status=0
+    </select>
+
+    <select id="findEmptyLargeBox" parameterType="java.lang.Integer" resultMap="box">
+        SELECT * FROM box_info WHERE box_size='大' AND group_id=#{groupId} and box_status=0
+    </select>
+
     <select id="findEmptyBoxes" resultMap="box">
         SELECT * from box_info WHERE group_id=(SELECT group_id FROM group_info WHERE position=#{position}) AND box_status='0'
         AND box_size=#{boxSize}
