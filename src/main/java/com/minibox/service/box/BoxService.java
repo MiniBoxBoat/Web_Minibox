@@ -1,10 +1,8 @@
 package com.minibox.service.box;
 
-import com.minibox.exception.BoxIsBusyException;
-import com.minibox.exception.ParameterException;
-import com.minibox.exception.RollbackException;
-import com.minibox.exception.TakenVirifyException;
+import com.minibox.exception.*;
 import com.minibox.po.Box;
+import com.minibox.vo.BoxVo;
 import com.minibox.vo.GroupVo;
 
 import java.util.List;
@@ -21,13 +19,21 @@ public interface BoxService {
     List<GroupVo> getGroupByDestination(String destination);
 
     /**
+     * 得到指定经纬度附近5000米之内的存放点
+     * @param lat
+     * @param lng
+     * @return
+     */
+    List<GroupVo> getGroupArourd(double lat, double lng);
+
+    /**
      * 保存订单
      * @param userName 用户名
      * @param groupId 存放点id
      * @param boxId boxId
      * @return 是否下单成功
      */
-    int addOrder(String userName, int groupId, String size, String taken) throws BoxIsBusyException, TakenVirifyException, RollbackException, ParameterException;
+    int addOrder(int userId, int groupId, String size, String taken) throws BoxIsBusyException, TakenVirifyException, RollbackException, ParameterException;
 
     /**
      *保存销售信息
@@ -39,10 +45,17 @@ public interface BoxService {
 
     /**
      * 得到用户正在使用的box
-     * @param userName 用户名
+     * @param taken taken
      * @return 用户的箱子
      */
-    List<Box> getBoxes(String userName);
+    List<BoxVo> getUsingBoxes(String taken) throws ServerException, TakenVirifyException;
+
+    /**
+     * 得到用户预约的箱子
+     * @param taken taken
+     * @return
+     */
+    List<BoxVo> getReservingBoxes(String taken) throws ServerException, TakenVirifyException;
 
     /**
      * 删除box
@@ -56,5 +69,5 @@ public interface BoxService {
      * @param groupId 存放点id
      * @return List<Box>
      */
-    List<Box> getAllBoxesByGroupId(int groupId);
+    List<BoxVo> getAllBoxesByGroupId(int groupId);
 }

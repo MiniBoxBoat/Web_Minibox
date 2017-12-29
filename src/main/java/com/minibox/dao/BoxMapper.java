@@ -24,6 +24,19 @@ public interface BoxMapper {
     List<GroupPo> findGroupsByDestination(String destination);
 
     /**
+     * 得到所有的存放点
+     * @return
+     */
+    List<GroupPo> findAllGroup();
+
+    /**
+     * 通过groupId找到存放点
+     * @param groupId
+     * @return
+     */
+    GroupPo findGroupByGroupId(int groupId);
+
+    /**
      * 箱子被预定或者被使用后改变可用箱子数量
      * @param position 存放点位置
      * @return 是否修改成功
@@ -40,12 +53,12 @@ public interface BoxMapper {
 
     /**
      * 储存一个订单
-     * @param userName 用户名
+     * @param userId 用户名
      * @param groupId 存放点id
      * @param boxId 箱子id
      * @return 是否存储成功
      */
-    boolean insertOrder(@Param("userName") String userName,@Param("groupId") int groupId, @Param("boxId") int boxId);
+    boolean insertOrder(@Param("userId") int userId,@Param("groupId") int groupId, @Param("boxId") int boxId);
 
     /**
      * 通过order的全部参数来添加一个order
@@ -85,10 +98,17 @@ public interface BoxMapper {
 
     /**
      * 得到用户正在使用的box
-     * @param userName 用户名
+     * @param userId 用户名
      * @return 用户使用的箱子
      */
-    List<Box> findBoxes(String userName);
+    List<Box> findUsingBoxes(int userId);
+
+    /**
+     * 得到用户预约的箱子
+     * @param userId 用户id
+     * @return
+     */
+    List<Box> findReservingBoxed(int userId);
 
     /**
      * 得到指定存放点的空小箱子

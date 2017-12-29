@@ -91,7 +91,7 @@ public class ReservationServiceImpl implements ReservationService {
         GroupPo group = boxMapper.findGroupByPosition(reservation.getPosition());
 
         Order order = new Order();
-        order.setUserName(user.getUserName());
+//        order.setUserName(user.getUserName());
         order.setGroupId(group.getGroupId());
         order.setBoxId(reservation.getBoxId());
 

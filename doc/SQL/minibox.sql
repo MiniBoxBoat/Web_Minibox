@@ -1,3 +1,10 @@
+-- ------------------------------
+-- The update
+-- ------------------------------
+alter table order_info change username user_id int not null;
+alter table sale_info change username user_id int not null;
+
+
 
 CREATE TABLE `reservation_info` (
                     `reservation_id` int(11) NOT NULL AUTO_INCREMENT,

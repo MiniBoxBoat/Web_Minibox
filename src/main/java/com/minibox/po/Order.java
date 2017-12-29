@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class Order {
     private int orderId;
-    private String userName;
+    private int userId;
     private int groupId;
     private int boxId;
     private String orderTime;
