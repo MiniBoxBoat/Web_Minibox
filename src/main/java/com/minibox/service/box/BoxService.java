@@ -2,6 +2,7 @@ package com.minibox.service.box;
 
 import com.minibox.exception.*;
 import com.minibox.po.Box;
+import com.minibox.po.Order;
 import com.minibox.vo.BoxVo;
 import com.minibox.vo.GroupVo;
 
@@ -28,12 +29,9 @@ public interface BoxService {
 
     /**
      * 保存订单
-     * @param userName 用户名
-     * @param groupId 存放点id
-     * @param boxId boxId
      * @return 是否下单成功
      */
-    int addOrder(int userId, int groupId, String size, String taken) throws BoxIsBusyException, TakenVirifyException, RollbackException, ParameterException;
+    List<Integer> addOrder(Order order, String size,int boxNum, String taken) throws BoxIsBusyException, TakenVirifyException, RollbackException, ParameterException;
 
     /**
      *保存销售信息
@@ -64,10 +62,17 @@ public interface BoxService {
      */
     boolean deleteOrder(int orderId) throws RollbackException;
 
-    /**
+/*    *//**
      * 通过groupId得倒所有箱子
      * @param groupId 存放点id
      * @return List<Box>
+     *//*
+    List<BoxVo> getAllBoxesByGroupId(int groupId);*/
+
+    /**
+     * 通过groupId得到group的信息
+     * @param groupId
+     * @return
      */
-    List<BoxVo> getAllBoxesByGroupId(int groupId);
+    GroupVo getGroup(int groupId);
 }

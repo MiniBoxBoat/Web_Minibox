@@ -4,6 +4,7 @@ import com.minibox.exception.BoxIsBusyException;
 import com.minibox.exception.ParameterException;
 import com.minibox.exception.TakenVirifyException;
 import com.minibox.po.Box;
+import com.minibox.po.Order;
 import com.minibox.service.box.BoxService;
 import com.minibox.service.user.UserService;
 import com.minibox.vo.BoxVo;
@@ -45,7 +46,8 @@ public class BoxController {
             map = MapUtil.toMap(200, "获取数据成功", groupVos);
             JsonUtil.toJSON(map);
         } catch (Exception e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
+            e.printStackTrace();
+            map = MapUtil.toMap(500, "服务器错误", e.getStackTrace());
             JsonUtil.toJSON(map);
         }
     }
@@ -69,12 +71,28 @@ public class BoxController {
         }
     }
 
+    @RequestMapping(value = "/showBoxGroup.do")
+    public void showBoxGroup(int groupId) {
+        Map map;
+        try{
+            GroupVo groupVo = boxService.getGroup(groupId);
+            if (groupVo==null){
+                throw new Exception();
+            }
+            map = MapUtil.toMap(200, "获取数据成功", groupVo);
+            JsonUtil.toJSON(map);
+        } catch (Exception e) {
+            map = MapUtil.toMap(500, "服务器错误", null);
+            JsonUtil.toJSON(map);
+        }
+    }
+
     @RequestMapping(value = "/order.do", method = RequestMethod.POST)
-    public void order(int userId, int groupId, String boxSize, String taken) {
+    public void order(Order order, int boxNum, String boxSize, String taken) {
         Map map;
         try {
-            Integer boxId = boxService.addOrder(userId, groupId, boxSize, taken);
-            if (boxId == 0) {
+            List<Integer> boxId = boxService.addOrder(order, boxSize,boxNum, taken);
+            if (boxId == null) {
                 throw new Exception();
             }
             map = MapUtil.toMap(200, "数据存储成功", boxId);
@@ -122,7 +140,7 @@ public class BoxController {
             JsonUtil.toJSON(map);
         } catch (Exception e) {
             e.printStackTrace();
-            map = MapUtil.toMap(500, "服务器错误", null);
+            map = MapUtil.toMap(500, "服务器错误", e.getStackTrace());
             JsonUtil.toJSON(map);
         }
     }
@@ -141,12 +159,13 @@ public class BoxController {
             map = MapUtil.toMap(403, e.getMessage(), null);
             JsonUtil.toJSON(map);
         } catch (Exception e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
+            e.printStackTrace();
+            map = MapUtil.toMap(500, "服务器错误", e.getStackTrace());
             JsonUtil.toJSON(map);
         }
     }
 
-    @RequestMapping(value = "/showAllBoxes.do", method = RequestMethod.GET)
+/*    @RequestMapping(value = "/showAllBoxes.do", method = RequestMethod.GET)
     public void showAllBoxes(int groupId) {
         Map map;
         try {
@@ -163,7 +182,7 @@ public class BoxController {
             map = MapUtil.toMap(500, "服务器错误", null);
             JsonUtil.toJSON(map);
         }
-    }
+    }*/
 
     @RequestMapping("test.do")
     public void test(HttpServletRequest request) {

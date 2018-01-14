@@ -1,3 +1,32 @@
+
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2501,40,40,116.3161623489,40.0153746854,'北京市海淀区北京大学(圆明园校区)');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2502,40,40,116.1904453961,40.2469132138,'北京市昌平区北京大学(昌平校区)');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2503,40,40,116.3570401231,39.7578759414,'北京市大兴区北京大学(大兴校区)');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2504,40,40,116.3312298913,39.9798037546,'北京市海淀区北京大学附属中学');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2505,40,40,116.3571734052,39.9837566384,'北京市海淀区北京大学医学部');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2506,40,40,116.3229277045,40.0029548074,'北京市海淀区清华大学工字厅');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2507,40,40,116.3355091598,39.9999648212,'北京市海淀区清华大学美术学院');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2508,40,40,116.3757742838,40.1076647444,'北京市昌平区北京邮电大学(宏福校区)');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2509,40,40,116.3757742838,40.1076647444,'北京市昌平区北京邮电大学(宏福校区)');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2510,40,40,116.2888464268,40.1573991591,'北京市昌平区 北京邮电大学(沙河校区)');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2511,40,40,116.3565445252,39.9605666118,'北京市海淀区北京邮电大学教学楼3');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2512,40,40,116.2702401680,40.1538852612,'北京市昌平区北京航空航天大学(沙河校区)');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2513,40,40,116.3512768375,39.9841386559,'北京市海淀区北京航空航天大学主楼');
+insert into group_info(group_id,quantity,empty,lng,lat,position)
+values(2514,40,40,116.3471868375,39.9779786559,'北京市海淀区北京航空航天大学-学知楼');
 -- ------------------------------
 -- The update
 -- ------------------------------
@@ -32,7 +61,7 @@ alter table user_info modify credibility int(5) default '100';
   -- ------------------------------
 -- The update
 -- ------------------------------
-  alter table user_info add taken varchar(255)
+  alter table user_info add taken varchar(255);
 -- ------------------------------
 -- The update
 -- ------------------------------

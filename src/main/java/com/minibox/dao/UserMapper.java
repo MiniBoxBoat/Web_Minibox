@@ -2,6 +2,7 @@ package com.minibox.dao;
 
 import com.minibox.dto.UserDto;
 import com.minibox.po.User;
+import com.minibox.po.VerifyCode;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -18,7 +19,7 @@ public interface UserMapper {
      * @param user 用户对象
      * * @return 是否存储成功
      */
-    int insertUser(User user);
+    boolean insertUser(User user);
 
     /**
      * 通过手机号找到用户
@@ -99,5 +100,12 @@ public interface UserMapper {
      */
     UserDto findUserByUserName(String userName);
 
+    /**
+     * 更新用户验证码
+     * @return
+     */
 
+    boolean insertVerifyCode(VerifyCode verifyCode);
+
+    VerifyCode findVerifyCode(String phoneNumber);
 }

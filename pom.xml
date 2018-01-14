@@ -217,11 +217,6 @@
       <artifactId>spring-aspects</artifactId>
       <version>5.0.2.RELEASE</version>
     </dependency>
-      <dependency>
-          <groupId>org.jetbrains</groupId>
-          <artifactId>annotations</artifactId>
-          <version>RELEASE</version>
-      </dependency>
 
     <dependency>
       <groupId>com.aliyun</groupId>

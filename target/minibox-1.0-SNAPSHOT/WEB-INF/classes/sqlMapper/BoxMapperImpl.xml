@@ -27,69 +27,98 @@
         <result property="delFlag" column="del_flag" javaType="java.lang.Integer"/>
     </resultMap>
 
+    <sql id="box_columns">
+        box_id,box_size,box_status,group_id
+    </sql>
+
     <sql id="order_column">
-        userId,group_id,box_id,order_time
+        user_id,group_id,box_id,order_time
+    </sql>
+
+    <sql id="order_colum_all">
+        order_id,user_id,group_id,box_id,order_time,delFlag
+    </sql>
+
+    <sql id="group_columns">
+        group_id,quantity,empty,lng,lat,position
     </sql>
 
     <select id="findGroupsByDestination" parameterType="java.lang.String" resultMap="group">
-        SELECT * FROM group_info WHERE position LIKE CONCAT(CONCAT('%',#{destination}),'%')
+        SELECT <include refid="group_columns"/>
+        FROM group_info
+        WHERE position LIKE #{destination}
     </select>
 
     <select id="findAllGroup" resultMap="group">
-        SELECT * from group_info
+        SELECT <include refid="group_columns"/>
+        from group_info
     </select>
 
     <select id="findGroupByGroupId" parameterType="java.lang.Integer" resultMap="group">
-        SELECT * from group_info WHERE group_id=#{groupId}
+        SELECT <include refid="group_columns"/>
+        from group_info
+        WHERE group_id=#{groupId}
     </select>
 
     <update id="reduceGroupBoxNum">
-        UPDATE group_info set empty=empty-1 WHERE position=#{position}
+        UPDATE group_info set empty=empty-#{num} WHERE group_id=#{groupId}
     </update>
 
     <update id="addGroupBoxNum" parameterType="java.lang.Integer">
         UPDATE group_info SET empty=empty+#{boxNum} WHERE group_id=#{groupId}
     </update>
-    
-    <insert id="insertOrderByAllParemater" parameterType="com.minibox.po.Order">
-        INSERT into order_info (<include refid="order_column"/>)
-        VALUES (#{userName},#{groupId},#{boxId},now())
-    </insert>
 
     <select id="findOrderByOrderId" parameterType="java.lang.Integer" resultMap="order">
-        SELECT * FROM order_info WHERE order_id=#{orderId}
+        SELECT <include refid="order_colum_all"/>
+        FROM order_info
+        WHERE order_id=#{orderId}
     </select>
 
     <select id="findBoxByBoxId" parameterType="java.lang.Integer" resultMap="box">
-        SELECT * FROM box_info WHERE box_id=#{boxId}
+        SELECT <include refid="box_columns"/> FROM box_info WHERE box_id=#{boxId}
     </select>
 
     <select id="findUsingBoxes" parameterType="java.lang.Integer" resultMap="box">
-        SELECT * from box_info WHERE box_id IN (SELECT box_id from order_info where user_id=#{userId})
+        SELECT <include refid="box_columns"/> from box_info WHERE box_id IN (SELECT box_id from order_info where user_id=#{userId} AND del_flag=0)
     </select>
 
     <select id="findReservingBoxed" parameterType="java.lang.Integer" resultMap="box">
-        select * from box_info WHERE box_id IN (SELECT box_id from reservation_info WHERE user_id=#{userId})
+        select <include refid="box_columns"/> from box_info WHERE box_id IN (SELECT box_id from reservation_info WHERE user_id=#{userId} and exp_flag=0)
     </select>
 
     <select id="findEmptySmallBox" parameterType="java.lang.Integer" resultMap="box">
-        SELECT * from box_info WHERE box_size='小' AND group_id=#{groupId} AND box_status=0
+        SELECT <include refid="box_columns"/>
+        FROM box_info
+        WHERE box_size='小' AND group_id=#{groupId} AND box_status=0
     </select>
 
-    <select id="findEmptyLargeBox" parameterType="java.lang.Integer" resultMap="box">
-        SELECT * FROM box_info WHERE box_size='大' AND group_id=#{groupId} and box_status=0
+    <select id="findEmptySmallBoxCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT count(box_id) from box_info WHERE box_size='小' AND group_id=#{groupId} AND box_status=0
+    </select>
+
+    <select id="findLargeBox" parameterType="java.lang.Integer" resultMap="box">
+        SELECT <include refid="box_columns"/>
+        FROM box_info
+        WHERE box_size='大' AND group_id=#{groupId} AND box_status=0
+    </select>
+
+    <select id="findEmptyLargeBoxCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT count(box_id) FROM box_info WHERE box_size='大' AND group_id=#{groupId} and box_status=0
     </select>
 
     <select id="findEmptyBoxes" resultMap="box">
-        SELECT * from box_info WHERE group_id=(SELECT group_id FROM group_info WHERE position=#{position}) AND box_status='0'
-        AND box_size=#{boxSize}
+        SELECT <include refid="box_columns"/> from box_info WHERE group_id=#{groupId} AND box_status='0' AND box_size=#{boxSize}
     </select>
 
     <select id="findBoxesByGroupId" parameterType="java.lang.Integer" resultMap="box">
-        SELECT * FROM box_info WHERE group_id=#{groupId}
+        SELECT <include refid="box_columns"/> FROM box_info WHERE group_id=#{groupId}
     </select>
 
-    <insert id="insertOrder">
+    <select id="findOrderByBoxId" parameterType="java.lang.Integer" resultMap="order">
+        select <include refid="order_colum_all"/> from order_info WHERE box_id=#{boxId} AND del_flag=0
+    </select>
+
+    <insert id="insertOrder" parameterType="com.minibox.po.Order">
         INSERT INTO order_info(user_id,group_id,box_id,order_time) VALUES (#{userId},#{groupId},#{boxId},now())
     </insert>
 
@@ -109,8 +138,4 @@
  end
  where box_id=#{boxId}
     </update>
-
-    <select id="findGroupByPosition" parameterType="java.lang.String" resultMap="group">
-        SELECT * FROM group_info WHERE position=#{position}
-    </select>
 </mapper>

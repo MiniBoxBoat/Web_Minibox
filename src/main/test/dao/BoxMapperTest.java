@@ -8,6 +8,7 @@ import com.minibox.po.Sale;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -23,8 +24,12 @@ public class BoxMapperTest {
 
     @Test
     public void findGroupsByDestinationTest(){
-        List<GroupPo> groupPos = boxMapper.findGroupsByDestination("南岸");
-        Assert.assertEquals(groupPos.size(), 7);
+        long start = System.currentTimeMillis();
+        String destination = "%南岸%";
+        System.out.println(destination);
+        List<GroupPo> groupPos = boxMapper.findGroupsByDestination(destination);
+        Assert.assertEquals(7, groupPos.size());
+        System.out.println(System.currentTimeMillis()-start);
     }
 
     @Test
@@ -76,8 +81,19 @@ public class BoxMapperTest {
 
     @Test
     public void findEmptyBoxesTest(){
-        List<Box> boxes = boxMapper.findEmptyBoxes("重庆市南岸区南坪万达","小");
-        System.out.println(boxes.size());
+/*        List<Box> boxes = boxMapper.findEmptyBoxes("重庆市南岸区南坪万达","小");
+        System.out.println(boxes.size());*/
+        long start = System.currentTimeMillis();
+        List<Box> boxes = boxMapper.findEmptySmallBox(1);
+        Assert.assertEquals(20, boxes.size());
+        System.out.println(System.currentTimeMillis()-start);
     }
 
+    @Test
+    public void findEmptyBoxedCountTest(){
+        long start = System.currentTimeMillis();
+        int emptySmallBoxesCount = boxMapper.findEmptySmallBoxCount(1);
+        Assert.assertEquals(20, emptySmallBoxesCount);
+        System.out.println(System.currentTimeMillis()-start);
+    }
 }

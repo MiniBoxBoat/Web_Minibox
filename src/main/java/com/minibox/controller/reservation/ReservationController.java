@@ -31,19 +31,18 @@ public class ReservationController {
     UserService userService;
 
     @RequestMapping(value = "reserve.do", method = RequestMethod.POST)
-    public void reserve(Reservation reservation) {
+    public void reserve(Reservation reservation, int boxNum,String taken) {
         Map map;
         try {
-            if (!reservationService.addReservation(reservation)) {
+            if (!reservationService.addReservation(reservation, boxNum, taken)) {
                 throw new Exception();
             }
-
             map = MapUtil.toMap(200, "预约成功", null);
             JsonUtil.toJSON(map);
         } catch (ParameterException e) {
             map = MapUtil.toMap(500, e.getMessage(), null);
             JsonUtil.toJSON(map);
-        } catch (BoxIsBusyException e) {
+        } catch (BoxIsBusyException | TakenVirifyException e) {
             map = MapUtil.toMap(400, e.getMessage(), null);
             JsonUtil.toJSON(map);
         } catch (ParameterIsNullException e) {

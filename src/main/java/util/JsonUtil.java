@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JsonUtil {
+    private static int times;
     public static Object json2Obj(String jsonStr, Class<?> cla) {
         Object obj = null;
         try {
@@ -59,6 +60,7 @@ public class JsonUtil {
         } catch (IOException e) {
             e.printStackTrace();
         } finally{
+            System.out.println("times = " + times++ + "object = " + o);
             try {
                 response.getWriter().close();
             } catch (IOException e) {
@@ -77,8 +79,33 @@ public class JsonUtil {
         return null;
     }
 
-    public static void toJSON(Object o){
-        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
-        toJSON(o,response);
+//    public static void toJSON(Object o){
+//        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+//        System.out.println("times = " + times++ + "object = " + o);
+//        toJSON(o,response);
+//    }
+
+    public static void toJSON(Object o) {
+        HttpServletResponse response = null;
+        try {
+            String str = JSONMapper.toJSON(o).render(false);
+            response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+            response.addHeader("Content-Type", "application/json; charset=utf-8");
+            response.setCharacterEncoding("UTF-8");
+            response.addHeader("Access-Control-Allow-Origin", "*");
+            response.addHeader("Access-Control-Allow-Methods","POST,GET");
+            response.getWriter().write(str);
+        } catch (MapperException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally{
+            try {
+                response.getWriter().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
+
 }

@@ -38,10 +38,10 @@ public interface BoxMapper {
 
     /**
      * 箱子被预定或者被使用后改变可用箱子数量
-     * @param position 存放点位置
+     * @param groupId 存放点位置
      * @return 是否修改成功
      */
-    boolean reduceGroupBoxNum(String position);
+    boolean reduceGroupBoxNum(@Param("groupId") int groupId, @Param("num") int num);
 
     /**
      * 箱子使用完过后可用箱子数量增加
@@ -53,19 +53,9 @@ public interface BoxMapper {
 
     /**
      * 储存一个订单
-     * @param userId 用户名
-     * @param groupId 存放点id
-     * @param boxId 箱子id
      * @return 是否存储成功
      */
-    boolean insertOrder(@Param("userId") int userId,@Param("groupId") int groupId, @Param("boxId") int boxId);
-
-    /**
-     * 通过order的全部参数来添加一个order
-     * @param order order
-     * @return 是否添加成功
-     */
-    boolean insertOrderByAllParemater(Order order);
+    boolean insertOrder(Order order);
 
     /**
      * 删除订单
@@ -117,6 +107,13 @@ public interface BoxMapper {
      */
     List<Box> findEmptySmallBox(int groupId);
 
+    /**
+     * 得到存放点空小箱子的数量
+     * @param groupId
+     * @return
+     */
+    int findEmptySmallBoxCount(int groupId);
+
      /**
      * 得到指定存放点的空大箱子
      * @param groupId
@@ -124,6 +121,12 @@ public interface BoxMapper {
      */
     List<Box> findEmptyLargeBox(int groupId);
 
+    /**
+     * 得到指定存放点的空大箱子的数量
+     * @param groupId
+     * @return
+     */
+    int findEmptyLargeBoxCount(int groupId);
     /**
      * 通过存放点id得到存放点的所有箱子
      * @param groupId 存放点id
@@ -133,10 +136,17 @@ public interface BoxMapper {
 
     /**
      * 得到所有指定大小的空闲箱子的id
-     * @param position 存放点
+     * @param groupId 存放点
      * @return 所有空闲箱子的id
      */
-    List<Box> findEmptyBoxes(@Param("position") String position, @Param("boxSize") String boxSize);
+    List<Box> findEmptyBoxes(@Param("groupId") int groupId, @Param("boxSize") String boxSize);
+
+    /**
+     * 通过正在使用的箱子的id来获得id
+     * @param boxId
+     * @return
+     */
+    Order findOrderByBoxId(int boxId);
 
     /**
      * 改变箱子的使用状态
@@ -144,15 +154,4 @@ public interface BoxMapper {
      * @return 是否更改成功
      */
     boolean updateBoxStatus(int boxId);
-
-    /**
-     * 通过地址找到存放点
-     * @param position 地址
-     * @return 存放点
-     */
-    GroupPo findGroupByPosition(String position);
-
-
-
-
 }

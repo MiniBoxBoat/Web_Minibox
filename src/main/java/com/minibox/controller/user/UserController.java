@@ -4,6 +4,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.minibox.dto.UserDto;
 import com.minibox.exception.*;
 import com.minibox.po.User;
+import com.minibox.po.VerifyCode;
 import com.minibox.service.user.UserService;
 import org.omg.PortableServer.THREAD_POLICY_ID;
 import org.springframework.dao.DuplicateKeyException;
@@ -75,7 +76,7 @@ public class UserController {
 
             map = MapUtil.toMap(200, "登录成功", user);
             JsonUtil.toJSON(map);
-
+            return;
         } catch (UserNotExistException | ParameterException | PasswordFailedException e) {
             map = MapUtil.toMap(401, e.getMessage(), null);
             JsonUtil.toJSON(map);
@@ -101,6 +102,7 @@ public class UserController {
             JsonUtil.toJSON(map);
 
         } catch (Exception e) {
+            e.printStackTrace();
             map = MapUtil.toMap(500, "服务器错误", null);
             JsonUtil.toJSON(map);
         }
@@ -136,15 +138,24 @@ public class UserController {
         Map map;
         try {
             String code = userService.sendSms(phoneNumber, request);
+            if (!userService.addVerifyCodeRe(new VerifyCode(phoneNumber, code))){
+                throw new Exception();
+            }
             map = MapUtil.toMap(200, "请求验证码成功", code);
             JsonUtil.toJSON(map);
         } catch (ClientException e) {
             map = MapUtil.toMap(400, "客户端请求错误", null);
             JsonUtil.toJSON(map);
         } catch (SendSmsFailedException e) {
+            e.printStackTrace();
             map = MapUtil.toMap(400, "客户端请求失败", null);
+            JsonUtil.toJSON(map);
         } catch (ParameterException e) {
             map = MapUtil.toMap(401, e.getMessage(), null);
+            JsonUtil.toJSON(map);
+        } catch (Exception e) {
+            map = MapUtil.toMap(500, "服务器错误", null);
+            JsonUtil.toJSON(map);
         }
     }
 

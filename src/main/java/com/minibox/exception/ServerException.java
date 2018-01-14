@@ -1,6 +1,6 @@
 package com.minibox.exception;
 
-public class ServerException extends Exception {
+public class ServerException extends RuntimeException {
 
     public static String msg = "服务器错误";
 

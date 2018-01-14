@@ -1,8 +1,5 @@
 package com.minibox.constants;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
 public enum BoxSize {
 
     SMALL("小"),LARGE("大");

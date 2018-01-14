@@ -4,6 +4,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.minibox.dto.UserDto;
 import com.minibox.exception.*;
 import com.minibox.po.User;
+import com.minibox.po.VerifyCode;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import org.springframework.web.context.support.HttpRequestHandlerServlet;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -18,7 +19,7 @@ public interface UserService {
      * @param user 用户对象
      * * @return 是否存储成功
      */
-    UserDto addUser (User user, String verifyCode, HttpServletRequest request) throws ParameterException, ParameterIsNullException, VerifyCodeException;
+    UserDto addUser (User user, String verifyCode, HttpServletRequest request) throws Exception;
 
     /**
      * 登录的时候检查用户名和密码是否错误
@@ -93,5 +94,7 @@ public interface UserService {
      * @return 是否发送成功
      */
     String sendSms(String phoneNumber, HttpServletRequest request) throws ClientException, SendSmsFailedException, ParameterException;
+
+    boolean addVerifyCodeRe(VerifyCode verifyCode);
 
 }
