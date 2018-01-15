@@ -18,6 +18,7 @@ public class User {
     private String image="";
     private String trueName="";
     private String taken="";
+    private String verifyCode="";
 
     @Override
     public String toString() {

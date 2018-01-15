@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ReservationService {
 
-    boolean addReservation(Reservation reservation) throws ParameterException, BoxIsBusyException, ParameterIsNullException, RollbackException;
+    boolean addReservation(Reservation reservation, int boxNum, String taken) throws ParameterException, BoxIsBusyException, ParameterIsNullException, RollbackException, TakenVirifyException;
 
     boolean deleteReservation(int reservationId);
 

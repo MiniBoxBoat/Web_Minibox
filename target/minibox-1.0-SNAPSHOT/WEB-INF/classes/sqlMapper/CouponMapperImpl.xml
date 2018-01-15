@@ -9,6 +9,10 @@
         <result property="deadlineTime" column="deadline_time" jdbcType="TIMESTAMP" javaType="java.lang.String"/>
     </resultMap>
 
+    <sql id="coupon_columns">
+        coupon_id,user_id,money,deadline_time
+    </sql>
+
     <insert id="insertCoupon" parameterType="com.minibox.po.Coupon">
         INSERT INTO coupon(user_id,money,deadline_time) VALUES (#{userId},#{money, javaType=DOUBLE},#{deadlineTime})
     </insert>
@@ -18,7 +22,7 @@
     </update>
 
     <select id="findCouponsByUserId" parameterType="java.lang.Integer" resultMap="coupon">
-        SELECT * FROM coupon WHERE user_id=#{userId}
+        SELECT <include refid="coupon_columns"/>  FROM coupon WHERE user_id=#{userId}
     </select>
 
 </mapper>

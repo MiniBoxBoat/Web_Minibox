@@ -1,25 +1,25 @@
 package com.minibox.controller.user;
 
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.minibox.dto.UserDto;
 import com.minibox.exception.*;
 import com.minibox.po.User;
+import com.minibox.po.VerifyCode;
 import com.minibox.service.user.UserService;
-import com.mysql.fabric.Server;
-import io.jsonwebtoken.SignatureException;
-import org.apache.commons.io.FileUtils;
+import org.omg.PortableServer.THREAD_POLICY_ID;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import util.*;
+import util.JsonUtil;
+import util.MapUtil;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author MEI
@@ -31,7 +31,7 @@ public class UserController {
     private static final String EXCEPTION_STR2 = "key 'phone_number'";
 
     @Resource
-    UserService userService;
+    private UserService userService;
 
     @RequestMapping(value = "/register.do", method = RequestMethod.POST)
     public void register(User user, String verifyCode, HttpServletRequest request) {
@@ -51,13 +51,10 @@ public class UserController {
                 map = MapUtil.toMap(409, "用户名已经被注册过了", null);
                 JsonUtil.toJSON(map);
             }
-        } catch (ParameterException e) {
+        } catch (ParameterException | ParameterIsNullException e) {
             map = MapUtil.toMap(403, e.getMessage(), null);
             JsonUtil.toJSON(map);
-        } catch (ParameterIsNullException e) {
-            map = MapUtil.toMap(403, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        }catch(VerifyCodeException e){
+        } catch(VerifyCodeException e){
             map = MapUtil.toMap(401, e.getMessage(), null);
             JsonUtil.toJSON(map);
         }
@@ -79,18 +76,12 @@ public class UserController {
 
             map = MapUtil.toMap(200, "登录成功", user);
             JsonUtil.toJSON(map);
-
-        } catch (UserNotExistException e) {
+            return;
+        } catch (UserNotExistException | ParameterException | PasswordFailedException e) {
             map = MapUtil.toMap(401, e.getMessage(), null);
             JsonUtil.toJSON(map);
         } catch (UserIsNullException e) {
             map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        } catch (PasswordFailedException e) {
-            map = MapUtil.toMap(401, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch (ParameterException e) {
-            map = MapUtil.toMap(401, e.getMessage(), null);
             JsonUtil.toJSON(map);
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,6 +102,7 @@ public class UserController {
             JsonUtil.toJSON(map);
 
         } catch (Exception e) {
+            e.printStackTrace();
             map = MapUtil.toMap(500, "服务器错误", null);
             JsonUtil.toJSON(map);
         }
@@ -130,10 +122,7 @@ public class UserController {
         } catch (TakenVirifyException e) {
             map = MapUtil.toMap(401, e.getMessage(), null);
             JsonUtil.toJSON(map);
-        } catch (ParameterException e) {
-            map = MapUtil.toMap(403, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch (ParameterIsNullException e) {
+        } catch (ParameterException | ParameterIsNullException e) {
             map = MapUtil.toMap(403, e.getMessage(), null);
             JsonUtil.toJSON(map);
         } catch (Exception e) {
@@ -149,15 +138,24 @@ public class UserController {
         Map map;
         try {
             String code = userService.sendSms(phoneNumber, request);
+            if (!userService.addVerifyCodeRe(new VerifyCode(phoneNumber, code))){
+                throw new Exception();
+            }
             map = MapUtil.toMap(200, "请求验证码成功", code);
             JsonUtil.toJSON(map);
         } catch (ClientException e) {
             map = MapUtil.toMap(400, "客户端请求错误", null);
             JsonUtil.toJSON(map);
         } catch (SendSmsFailedException e) {
+            e.printStackTrace();
             map = MapUtil.toMap(400, "客户端请求失败", null);
+            JsonUtil.toJSON(map);
         } catch (ParameterException e) {
             map = MapUtil.toMap(401, e.getMessage(), null);
+            JsonUtil.toJSON(map);
+        } catch (Exception e) {
+            map = MapUtil.toMap(500, "服务器错误", null);
+            JsonUtil.toJSON(map);
         }
     }
 
@@ -180,15 +178,13 @@ public class UserController {
     public void updateAvatar(int userId, @RequestParam("file") CommonsMultipartFile file, HttpServletRequest request) {
         Map map;
         try {
-            String path = request.getServletContext().getRealPath("/images/");
-            String fileName = System.currentTimeMillis() + file.getOriginalFilename();
-            File file1 = new File(path, fileName);
-            FileUtils.writeByteArrayToFile(file1, file.getBytes());
-            userService.updateUserAvatar("http://box.jay86.com:8080/minibox/images/" + fileName, userId);
+            if (!userService.updateUserAvatar(request, file, userId)){
+                throw new Exception();
+            }
             map = MapUtil.toMap(200, "修改头像成功", null);
             JsonUtil.toJSON(map);
-        } catch (IOException e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
+        } catch (Exception e){
+            map = MapUtil.toMap(500, "服务器错误!!!!!!", e.getStackTrace());
             JsonUtil.toJSON(map);
         }
     }

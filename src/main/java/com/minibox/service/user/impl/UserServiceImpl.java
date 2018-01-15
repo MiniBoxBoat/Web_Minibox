@@ -6,8 +6,11 @@ import com.minibox.dao.UserMapper;
 import com.minibox.dto.UserDto;
 import com.minibox.exception.*;
 import com.minibox.po.User;
+import com.minibox.po.VerifyCode;
 import com.minibox.service.user.UserService;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import util.FormatUtil;
 import util.JavaWebTaken;
 import util.RamdomNumberUtil;
@@ -15,6 +18,11 @@ import util.Sms;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,16 +42,11 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
 
     @Override
-    public UserDto addUser(User user,String verifyCode, HttpServletRequest request) throws ParameterException, ParameterIsNullException, VerifyCodeException {
+    public UserDto addUser(User user,String verifyCode, HttpServletRequest request) throws Exception {
 
         if (user.getUserName()==null || user.getEmail()==null || user.getSex()==null||verifyCode==null){
             throw new ParameterIsNullException("前检查信息是否填写完整");
         }
-
-        if (!verifyCode.equals(request.getSession().getAttribute("code"))){
-            throw new VerifyCodeException();
-        }
-
         if (user.getUserName().length()>10){
             throw new ParameterException("用户名不要超过十个字符");
         }
@@ -53,7 +56,17 @@ public class UserServiceImpl implements UserService {
         if (user.getPassword().length()<5){
             throw new ParameterException("密码不要小于五个字符");
         }
-        userMapper.insertUser(user);
+        if (userMapper.findUserByPhoneNumber(user.getPhoneNumber())!= null){
+            throw new ParameterException("手机号已经被注册过了");
+        }
+
+        VerifyCode verifyCode1 = userMapper.findVerifyCode(user.getPhoneNumber());
+        if (!verifyCode1.getVerifyCode().equals(verifyCode)){
+            throw new ParameterException("验证码错误");
+        }
+        if (!userMapper.insertUser(user)){
+            throw new Exception();
+        }
         UserDto userDto = userMapper.findUserByUserNameAndPassword(user.getUserName(), user.getPassword());
         return userDto;
     }
@@ -115,8 +128,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUserAvatar(String avatar, int userId) {
-        return userMapper.updateAvatar(avatar, userId);
+    public boolean updateUserAvatar(HttpServletRequest request, CommonsMultipartFile file, int userId) throws IOException {
+        String path = request.getServletContext().getRealPath("/images/");
+        String fileName = System.currentTimeMillis() + file.getOriginalFilename();
+        File file1 = new File(path, fileName);
+        FileUtils.writeByteArrayToFile(file1, file.getBytes());
+        while(!file1.exists()){}
+        deleteAvatarFile(userId,path);
+        String avatarUrl = "http://box.jay86.com:8080/minibox/images/" + fileName;
+        return userMapper.updateAvatar(avatarUrl, userId);
+    }
+
+    @Override
+    public boolean deleteAvatarFile(int userId, String parantPath) throws IOException {
+        UserDto user = userMapper.findUserByUserId(userId);
+        String oldAvatarUrl = user.getImage();
+        String[] strs = oldAvatarUrl.split("/");
+        String oldAvatarFileName = strs[(strs.length-1)];
+        Path path = Paths.get(parantPath, oldAvatarFileName);
+        return Files.deleteIfExists(path);
     }
 
     @Override
@@ -135,14 +165,22 @@ public class UserServiceImpl implements UserService {
         if (!FormatUtil.isPhoneNumberLegal(phoneNumber)){
             throw new ParameterException("手机号格式不正确");
         }
+        if (userMapper.findUserByPhoneNumber(phoneNumber)!=null){
+            throw new ParameterException("手机号已经被注册过了");
+        }
         String code = RamdomNumberUtil.makeCode();
         SendSmsResponse sendSmsResponse = Sms.sendSms(phoneNumber, code);
 
         if (sendSmsResponse.getCode() == null || !sendSmsResponse.getCode().equals("OK")) {
+            System.out.println(sendSmsResponse.getCode());
             throw new SendSmsFailedException();
         }
-        request.getSession().setAttribute("code", code);
         return code;
+    }
+
+    @Override
+    public boolean addVerifyCodeRe(VerifyCode verifyCode) {
+        return userMapper.insertVerifyCode(verifyCode);
     }
 
     @Override

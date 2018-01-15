@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
  */
 @Data
 public class Sale {
-    private String userName;
+    private int saleInfoId;
+    private int userId;
     private int boxId;
     private int groupId;
     private String payTime;

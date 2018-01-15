@@ -43,6 +43,8 @@
           <element id="library" level="project" name="Maven: org.springframework:spring-aop:5.0.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-aspects:5.0.2.RELEASE" />
           <element id="library" level="project" name="Maven: org.aspectj:aspectjweaver:1.8.13" />
+          <element id="library" level="project" name="Maven: com.aliyun:aliyun-java-sdk-core:3.5.0" />
+          <element id="library" level="project" name="Maven: com.github.1991wangliang:aliyun-java-sdk-dysmsapi:1.0.0" />
         </element>
       </element>
       <element id="directory" name="META-INF">

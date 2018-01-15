@@ -19,13 +19,15 @@ public class TestUtil {
         return code.toString();
     }
 
+    public static void testStr(String s){
+        String[] strings = s.split("/");
+        String str = strings[(strings.length-1)];
+        for (String string : strings) {
+            System.out.println(string);
+        }
+    }
+
     public static void main(String[] args){
-        LocalDateTime time = LocalDateTime.parse("2017-10-5 12:25", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        System.out.println(time.getYear());
-        System.out.println(time.getMinute());
-/*        LocalDateTime time = LocalDateTime.now();
-        System.out.println(time.toString());*/
-
-
+        testStr("http://box.jay86.com:8080/minibox/image/4256-106.jpg");
     }
 }

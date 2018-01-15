@@ -29,6 +29,11 @@
         <result property="useTime" column="use_time"/>
     </resultMap>
 
+    <resultMap id="verifyCode" type="com.minibox.po.VerifyCode">
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="verifyCode" column="verify_code"/>
+    </resultMap>
+
     <sql id="userDto_column">
         user_id,username,phone_number,sex,email,image,true_name,taken,credibility,use_time
     </sql>
@@ -36,6 +41,12 @@
     <sql id="user_column">
         user_id,userName,password,phone_number,sex,email,image,true_name,taken,credibility,use_time
     </sql>
+
+    <sql id="verifyCode_column">
+        phone_number,verify_code
+    </sql>
+
+
 
     <insert id="insertUser" parameterType="com.minibox.po.User" keyColumn="user_id" useGeneratedKeys="true">
         INSERT INTO user_info(username,password,phone_number,sex,email,credibility,use_time) VALUES (#{userName},#{password},#{phoneNumber},#{sex},#{email},#{credibility},#{useTime})
@@ -79,11 +90,11 @@
     </update>
 
     <update id="updateUseTime">
-        UPDATE user_info SET use_time=use_time+1 WHERE user_id=
+        UPDATE user_info SET use_time=use_time+1 WHERE user_id=#{userId}
     </update>
 
     <select id="findUserByPhoneNumberAndPassword" resultMap="userDto">
-        SELECT * from user_info WHERE phone_number=#{phoneNumber} and password=#{password}
+        SELECT <include refid="userDto_column"/> from user_info WHERE phone_number=#{phoneNumber} and password=#{password}
     </select>
 
     <select id="findUserByUserName" resultMap="userDto">
@@ -105,6 +116,14 @@
     <update id="updateUserCredibility">
         update user_info set credibility=credibility+5 where
         (select count(reservation_id) from reservation_info where reservation_info.user_id=user_info.user_id
-        and open_time>Date_add(now(), interval '-7' DAY) and exp_flag=1)=0
+        and open_time>Date_add(now(), interval '-7' DAY) and exp_flag=1)=0 and 100>user_info.credibility
     </update>
+
+    <insert id="insertVerifyCode" parameterType="com.minibox.po.VerifyCode">
+        insert into verifycode(phone_number, verify_code) VALUES (#{phoneNumber},#{verifyCode})
+     </insert>
+
+    <select id="findVerifyCode" parameterType="java.lang.String" resultMap="verifyCode">
+        select <include refid="verifyCode_column"/> from verifycode where phone_number=#{phoneNumber}
+    </select>
 </mapper>

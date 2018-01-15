@@ -32,7 +32,6 @@ public class JavaWebTaken {
     }
 
     public static Map<String, Object> verifyJavaWebToken(String jwt) throws ServerException, TakenVirifyException {
-
         Map<String, Object> jwtClaims = null;
         try {
             jwtClaims = Jwts.parser().setSigningKey(getKeyInstance()).parseClaimsJws(jwt).getBody();
@@ -54,6 +53,11 @@ public class JavaWebTaken {
             throw new TakenVirifyException();
         }
         return jwtClaims;
+    }
+
+    public static int getTakenUserId(String taken) throws ServerException, TakenVirifyException {
+        Map<String,Object> jwtClaims = verifyJavaWebToken(taken);
+        return (int) jwtClaims.get("userId");
     }
 
     private static String createJWT(String id) {

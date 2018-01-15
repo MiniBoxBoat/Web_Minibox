@@ -26,7 +26,6 @@ public class ReservationTest {
         Reservation reservation = new Reservation();
         reservation.setBoxId(102);
         reservation.setOpenTime("2017-10-5 10:05");
-        reservation.setPosition("重庆市南岸区南坪万达");
         reservation.setBoxSize("小");
         reservation.setPhoneNumber("15808060138");
         reservation.setUserName("mei");

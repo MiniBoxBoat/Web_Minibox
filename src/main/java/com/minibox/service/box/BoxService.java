@@ -1,9 +1,9 @@
 package com.minibox.service.box;
 
-import com.minibox.exception.BoxIsBusyException;
-import com.minibox.exception.RollbackException;
-import com.minibox.exception.TakenVirifyException;
+import com.minibox.exception.*;
 import com.minibox.po.Box;
+import com.minibox.po.Order;
+import com.minibox.vo.BoxVo;
 import com.minibox.vo.GroupVo;
 
 import java.util.List;
@@ -17,16 +17,21 @@ public interface BoxService {
      * @param lat 当前位置纬度
      * @return 存放点
      */
-    List<GroupVo> getGroupByDestination(String destination, double lng, double lat);
+    List<GroupVo> getGroupByDestination(String destination);
+
+    /**
+     * 得到指定经纬度附近5000米之内的存放点
+     * @param lat
+     * @param lng
+     * @return
+     */
+    List<GroupVo> getGroupArourd(double lat, double lng);
 
     /**
      * 保存订单
-     * @param userName 用户名
-     * @param groupId 存放点id
-     * @param boxId boxId
      * @return 是否下单成功
      */
-    boolean addOrder(String userName, int groupId, int boxId, String taken) throws BoxIsBusyException, TakenVirifyException, RollbackException;
+    List<Integer> addOrder(Order order, String size,int boxNum, String taken) throws BoxIsBusyException, TakenVirifyException, RollbackException, ParameterException;
 
     /**
      *保存销售信息
@@ -38,10 +43,17 @@ public interface BoxService {
 
     /**
      * 得到用户正在使用的box
-     * @param userName 用户名
+     * @param taken taken
      * @return 用户的箱子
      */
-    List<Box> getBoxes(String userName);
+    List<BoxVo> getUsingBoxes(String taken) throws ServerException, TakenVirifyException;
+
+    /**
+     * 得到用户预约的箱子
+     * @param taken taken
+     * @return
+     */
+    List<BoxVo> getReservingBoxes(String taken) throws ServerException, TakenVirifyException;
 
     /**
      * 删除box
@@ -50,10 +62,17 @@ public interface BoxService {
      */
     boolean deleteOrder(int orderId) throws RollbackException;
 
-    /**
+/*    *//**
      * 通过groupId得倒所有箱子
      * @param groupId 存放点id
      * @return List<Box>
+     *//*
+    List<BoxVo> getAllBoxesByGroupId(int groupId);*/
+
+    /**
+     * 通过groupId得到group的信息
+     * @param groupId
+     * @return
      */
-    List<Box> getAllBoxesByGroupId(int groupId);
+    GroupVo getGroup(int groupId);
 }

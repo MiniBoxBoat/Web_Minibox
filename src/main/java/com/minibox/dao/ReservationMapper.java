@@ -27,4 +27,6 @@ public interface ReservationMapper {
     Reservation findReservationByReservationId(int reservationId);
 
     boolean updateReservationExpFlag();
+
+    Reservation findReservationByBoxId(int boxId);
 }
