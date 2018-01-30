@@ -3,14 +3,11 @@ package com.minibox.controller.box;
 import com.minibox.exception.BoxIsBusyException;
 import com.minibox.exception.ParameterException;
 import com.minibox.exception.TakenVirifyException;
-import com.minibox.po.Box;
 import com.minibox.po.Order;
 import com.minibox.service.box.BoxService;
 import com.minibox.service.user.UserService;
 import com.minibox.vo.BoxVo;
 import com.minibox.vo.GroupVo;
-import org.aspectj.weaver.ast.Test;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -165,27 +162,12 @@ public class BoxController {
         }
     }
 
-/*    @RequestMapping(value = "/showAllBoxes.do", method = RequestMethod.GET)
-    public void showAllBoxes(int groupId) {
-        Map map;
-        try {
-            List<BoxVo> boxes = boxService.getAllBoxesByGroupId(groupId);
-            if (boxes.size() == 0 || boxes == null) {
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "获取数据成功", boxes);
-            JsonUtil.toJSON(map);
-        } catch (TakenVirifyException e) {
-            map = MapUtil.toMap(403, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch (Exception e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
-    }*/
-
     @RequestMapping("test.do")
     public void test(HttpServletRequest request) {
         System.out.println(request.getServletContext().getRealPath("images"));
+    }
+
+    public static void main(String[] args){
+        BoxController boxController = new BoxController();
     }
 }

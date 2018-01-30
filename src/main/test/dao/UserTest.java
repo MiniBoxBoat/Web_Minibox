@@ -73,6 +73,12 @@ public class UserTest {
         Assert.assertEquals(true, flag);
     }
 
+    @Test
+    public void updateAvatar(){
+        boolean flag = userMapper.updateAvatar("1111",131);
+        Assert.assertEquals(true, flag);
+    }
+
 
 
 }

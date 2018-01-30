@@ -1,3 +1,0 @@
-26-Dec-2017 00:06:02.402 INFO [localhost-startStop-1] org.apache.catalina.core.ApplicationContext.log No Spring WebApplicationInitializer types detected on classpath
-26-Dec-2017 00:06:02.532 INFO [localhost-startStop-1] org.apache.catalina.core.ApplicationContext.log Initializing Spring root WebApplicationContext
-26-Dec-2017 00:06:11.369 INFO [localhost-startStop-1] org.apache.catalina.core.ApplicationContext.log Initializing Spring FrameworkServlet 'DispatcherServlet'

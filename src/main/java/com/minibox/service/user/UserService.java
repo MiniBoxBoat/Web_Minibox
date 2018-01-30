@@ -51,6 +51,8 @@ public interface UserService {
      */
     boolean updateUserUserUseTime(int userId);
 
+    boolean updateAvatar(int userId, String avatarUrl);
+
     /**
      * 修改用户头像
      * @param avatar 用户头像链接地址

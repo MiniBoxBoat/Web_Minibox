@@ -174,7 +174,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/updateAvatar.do", method = RequestMethod.POST)
+/*    @RequestMapping(value = "/updateAvatar.do", method = RequestMethod.POST)
     public void updateAvatar(int userId, @RequestParam("file") CommonsMultipartFile file, HttpServletRequest request) {
         Map map;
         try {
@@ -185,6 +185,21 @@ public class UserController {
             JsonUtil.toJSON(map);
         } catch (Exception e){
             map = MapUtil.toMap(500, "服务器错误!!!!!!", e.getStackTrace());
+            JsonUtil.toJSON(map);
+        }
+    }*/
+
+    @RequestMapping(value = "/updateAvatar.do",method = RequestMethod.POST)
+    public void updateAvatar(int userId, String avatarUrl){
+        Map map;
+        try {
+            if (!userService.updateAvatar(userId, avatarUrl)){
+                throw new Exception("服务器错误");
+            }
+            map = MapUtil.toMap(200, "修改头像成功", null);
+            JsonUtil.toJSON(map);
+        }catch (Exception e){
+            map = MapUtil.toMap(500, e.getMessage(), null);
             JsonUtil.toJSON(map);
         }
     }
@@ -198,7 +213,8 @@ public class UserController {
             if (!userService.updatePassword(newPassword, userId, taken)) {
                 throw new Exception();
             }
-
+            map = MapUtil.toMap(200, "修改密码成功", null);
+            JsonUtil.toJSON(map);
         } catch (ParameterException e) {
             map = MapUtil.toMap(400, e.getMessage(), null);
             JsonUtil.toJSON(map);

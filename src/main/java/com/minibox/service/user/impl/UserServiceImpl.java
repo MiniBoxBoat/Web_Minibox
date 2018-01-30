@@ -128,6 +128,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean updateAvatar(int userId, String avatarUrl){
+        return userMapper.updateAvatar(avatarUrl, userId);
+    }
+
+    @Override
     public boolean updateUserAvatar(HttpServletRequest request, CommonsMultipartFile file, int userId) throws IOException {
         String path = request.getServletContext().getRealPath("/images/");
         String fileName = System.currentTimeMillis() + file.getOriginalFilename();

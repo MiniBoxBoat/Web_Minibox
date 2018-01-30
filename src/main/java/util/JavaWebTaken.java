@@ -12,8 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static util.RedirectPrinter.*;
-import static util.Print.*;
+import static util.Print.printnb;
 
 /**
  * @author MEI

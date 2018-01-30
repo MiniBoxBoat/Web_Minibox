@@ -76,6 +76,7 @@
      </update>
 
     <select id="findReservationByBoxId" parameterType="java.lang.Integer" resultMap="reservation">
-        select <include refid="reservation_column"/> from reservation_info WHERE box_id=#{boxId} and del_flag='0'
+        select <include refid="reservation_column"/> from reservation_info WHERE box_id=#{boxId}
+        and del_flag='0' and exp_flag='0'
     </select>
 </mapper>
