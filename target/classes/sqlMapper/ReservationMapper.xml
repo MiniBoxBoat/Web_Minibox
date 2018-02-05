@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.minibox.dao.ReservationMapper">
-    <resultMap id="reservation" type="com.minibox.po.Reservation">
+    <resultMap id="reservation" type="com.minibox.po.ReservationPo">
         <id property="reservationId" column="reservation_id"/>
         <result property="userId" column="user_id"/>
         <result property="openTime" column="open_time"/>
@@ -13,22 +13,24 @@
         <result property="boxSize" column="box_size"/>
         <result property="delFlag" column="del_flag" javaType="java.lang.Integer"/>
         <result property="expFlag" column="exp_flag" javaType="java.lang.Integer"/>
-</resultMap>
+    </resultMap>
 
     <sql id="reservation_column">
-        reservation_id,user_id,open_time,use_time,user_name,phone_number,group_id,box_id,box_size,del_flag,exp_flag
+        reservation_id, user_id, open_time, use_time, user_name, phone_number, group_id, box_id, box_size, del_flag, exp_flag
     </sql>
 
-    <insert id="insertReservation" parameterType="com.minibox.po.Reservation">
-        INSERT INTO reservation_info(open_time,user_id,use_time,user_name,phone_number,group_id,box_id,box_size)
-        VALUES (#{openTime},#{userId},#{useTime},#{userName},#{phoneNumber},#{groupId},#{boxId},#{boxSize})
+    <insert id="insertReservation" parameterType="com.minibox.po.ReservationPo">
+        INSERT INTO reservation_info (open_time, user_id, use_time, user_name, phone_number, group_id, box_id, box_size)
+        VALUES (#{openTime}, #{userId}, #{useTime}, #{userName}, #{phoneNumber}, #{groupId}, #{boxId}, #{boxSize})
     </insert>
 
-    <update id="removeReservation" parameterType="java.lang.Integer">
-        UPDATE reservation_info SET del_flag='1' WHERE reservation_id=#{reservationId}
+    <update id="removeReservationByReservationId" parameterType="java.lang.Integer">
+        UPDATE reservation_info
+        SET del_flag = '1'
+        WHERE reservation_id = #{reservationId}
     </update>
 
-    <update id="updateReservation" parameterType="com.minibox.po.Reservation">
+    <update id="updateReservation" parameterType="com.minibox.po.ReservationPo">
         UPDATE reservation_info
         <set>
             <if test="openTime!=null">
@@ -43,40 +45,34 @@
             <if test="phoneNumber!=null">
                 phone_number=#{phoneNumber},
             </if>
-            <if test="groupId!=0">
-                group_id=#{groupId}
-            </if>
         </set>
         WHERE reservation_id=#{reservationId}
     </update>
 
-    <select id="findAllReservations" resultMap="reservation">
-        SELECT <include refid="reservation_column"/> FROM reservation_info
-    </select>
-
-    <select id="findReservations" parameterType="java.lang.String" resultMap="reservation">
+    <select id="findReservationsByUserId" parameterType="java.lang.InternalError" resultMap="reservation">
         SELECT
         <include refid="reservation_column"/>
-        FROM reservation_info WHERE user_name=#{userName}
-    </select>
-
-    <select id="findReservationsByUserId" parameterType="java.lang.InternalError" resultMap="reservation">
-        SELECT <include refid="reservation_column"/> FROM reservation_info WHERE user_id=#{userId}
+        FROM reservation_info WHERE user_id=#{userId}
     </select>
 
     <select id="findReservationByReservationId" parameterType="java.lang.Integer" resultMap="reservation">
-        SELECT <include refid="reservation_column"/> FROM reservation_info WHERE reservation_id=#{reservationId}
+        SELECT
+        <include refid="reservation_column"/>
+        FROM reservation_info WHERE reservation_id=#{reservationId}
     </select>
 
-    <update id="updateReservationExpFlag">
-        update reservation_info,user_info,box_info SET exp_flag='1',credibility=credibility-10,box_status='0'
+    <update id="updateOverdueReservationExpFlag">
+        UPDATE reservation_info, user_info, box_info
+        SET exp_flag = '1', credibility = credibility - 10, box_status = '0'
         WHERE now() > DATE_ADD(open_time, INTERVAL reservation_info.use_time HOUR)
-        AND user_info.user_id=reservation_info.user_id AND box_info.box_id=reservation_info.box_id
-        AND exp_flag='0'
-     </update>
+              AND user_info.user_id = reservation_info.user_id AND box_info.box_id = reservation_info.box_id
+              AND exp_flag = '0'
+    </update>
 
     <select id="findReservationByBoxId" parameterType="java.lang.Integer" resultMap="reservation">
-        select <include refid="reservation_column"/> from reservation_info WHERE box_id=#{boxId}
+        select
+        <include refid="reservation_column"/>
+        from reservation_info WHERE box_id=#{boxId}
         and del_flag='0' and exp_flag='0'
     </select>
 </mapper>

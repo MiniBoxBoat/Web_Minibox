@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.minibox.dao.GroupMapper">
+    <resultMap id="group" type="com.minibox.po.GroupPo">
+        <id property="groupId" column="group_id"/>
+        <result property="quantity" column="quantity"/>
+        <result property="empty" column="empty"/>
+        <result property="lng" column="lng"/>
+        <result property="lat" column="lat"/>
+        <result property="position" column="position"/>
+    </resultMap>
+
+    <sql id="group_columns">
+        group_id, quantity, empty, lng, lat, position
+    </sql>
+
+    <select id="findGroupsByDestination" parameterType="java.lang.String" resultMap="group">
+        SELECT
+        <include refid="group_columns"/>
+        FROM group_info
+        WHERE position LIKE #{destination}
+    </select>
+
+    <select id="findAllGroup" resultMap="group">
+        SELECT
+        <include refid="group_columns"/>
+        FROM group_info
+    </select>
+
+    <select id="findGroupByGroupId" parameterType="java.lang.Integer" resultMap="group">
+        SELECT
+        <include refid="group_columns"/>
+        FROM group_info
+        WHERE group_id=#{groupId}
+    </select>
+
+    <update id="reduceGroupBoxNum">
+        UPDATE group_info
+        SET empty = empty - #{num}
+        WHERE group_id = #{groupId}
+    </update>
+
+    <update id="increaseGroupBoxNum" parameterType="java.lang.Integer">
+        UPDATE group_info
+        SET empty = empty + #{num}
+        WHERE group_id = #{groupId}
+    </update>
+
+</mapper>

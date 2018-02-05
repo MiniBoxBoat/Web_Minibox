@@ -2,10 +2,11 @@ package com.minibox.exception;
 
 public class ServerException extends RuntimeException {
 
-    public static String msg = "服务器错误";
+    private static String MSG= "服务器错误";
+    public static int STATUS = 500;
 
     public ServerException(){
-        super(msg);
+        super(MSG);
         this.printStackTrace();
     }
 }

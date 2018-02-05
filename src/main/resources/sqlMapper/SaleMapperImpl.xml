@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.minibox.dao.SaleMapper">
+
+    <sql id="sale_info_columns">
+        sale_info_id, user_id, box_id, group_id, pay_time, order_time, cost
+    </sql>
+
+    <insert id="insertSaleInfo" parameterType="com.minibox.po.SalePo">
+        INSERT INTO sale_info (user_id, box_id, group_id, pay_time, order_time, cost)
+        VALUES (#{userId}, #{boxId}, #{groupId}, now(), #{orderTime}, #{cost})
+    </insert>
+</mapper>

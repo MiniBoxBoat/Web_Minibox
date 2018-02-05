@@ -1,86 +1,44 @@
 package com.minibox.controller.coupon;
 
-import com.minibox.po.Coupon;
-import com.minibox.service.coupon.CouponService;
-import org.springframework.stereotype.Controller;
+import com.minibox.dto.ResponseEntity;
+import com.minibox.po.CouponPo;
+import com.minibox.service.CouponService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import util.JsonUtil;
-import util.MapUtil;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
+import static com.minibox.constants.RequestResult.SUCCESS;
 
 /**
  * @author MEI
  */
-@Controller
-@RequestMapping(value = "/coupon")
+@RestController()
+@RequestMapping("coupon")
 public class CouponController {
 
-    @Resource
+    @Autowired
     CouponService couponService;
 
-    @RequestMapping(value = "addCoupon.do", method = RequestMethod.POST)
-    public void addCoupon(int userId, int money, String deadlineTime) {
-        Map map;
-        try {
-            if (!couponService.addCoupon(userId, money, deadlineTime)) {
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "操作成功", null);
-            JsonUtil.toJSON(map);
-        } catch (Exception e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
+    @PostMapping("addCoupon.do")
+    public ResponseEntity<Object> addCoupon(CouponPo coupon, String taken) {
+        couponService.addCoupon(coupon, taken);
+        return new ResponseEntity<>(200, SUCCESS, null);
     }
 
-    @RequestMapping(value = "deleteCoupon.do", method = RequestMethod.GET)
-    public void deleteCoupon(int couponId) {
-        Map map;
-        try {
-            if (!couponService.deleteCoupon(couponId)) {
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "操作成功", null);
-            JsonUtil.toJSON(map);
-        } catch (Exception e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
+    @GetMapping("deleteCoupon.do")
+    public ResponseEntity<Object> deleteCoupon(int couponId) {
+        couponService.deleteCoupon(couponId);
+        return new ResponseEntity<>(200, SUCCESS, null);
     }
 
-    @RequestMapping(value = "showCoupon.do", method = RequestMethod.GET)
-    public void showCoupon(int userId) {
-        Map map;
-        try {
-            List<Coupon> coupons = couponService.getCoupons(userId);
-            if (coupons == null) {
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "获取数据成功", coupons);
-            JsonUtil.toJSON(map);
-        } catch (Exception e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
-    }
-
-    public static void main(String[] args) {
-        CouponController controller = new CouponController();
-        Method[] methods = controller.getClass().getDeclaredMethods();
-        int i = 0;
-        for (Method method : methods) {
-            RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-            if (requestMapping == null){
-                continue;
-            }
-            System.out.println(Arrays.toString(requestMapping.value()));
-        }
+    @PostMapping("showCoupon.do")
+    public ResponseEntity<List<CouponPo>> showCoupons(String taken) {
+        System.out.println(taken);
+        List<CouponPo> coupons = couponService.getCouponsByUserId(taken);
+        return new ResponseEntity<>(200, SUCCESS, coupons);
     }
 }

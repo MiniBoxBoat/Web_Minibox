@@ -1,9 +1,8 @@
 package com.minibox.dao;
 
-import com.minibox.po.Reservation;
+import com.minibox.po.ReservationPo;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -12,21 +11,17 @@ import java.util.List;
 @Repository
 public interface ReservationMapper {
 
-    boolean insertReservation(Reservation reservation);
+    boolean insertReservation(ReservationPo reservation);
 
-    boolean removeReservation(int reservationId);
+    boolean removeReservationByReservationId(int reservationId);
 
-    boolean updateReservation(Reservation reservation);
+    boolean updateReservation(ReservationPo reservation);
 
-    List<Reservation> findAllReservations();
+    List<ReservationPo> findReservationsByUserId(int userId);
 
-    List<Reservation> findReservations(String userName);
+    ReservationPo findReservationByReservationId(int reservationId);
 
-    List<Reservation> findReservationsByUserId(int userId);
+    boolean updateOverdueReservationExpFlag();
 
-    Reservation findReservationByReservationId(int reservationId);
-
-    boolean updateReservationExpFlag();
-
-    Reservation findReservationByBoxId(int boxId);
+    ReservationPo findReservationByBoxId(int boxId);
 }

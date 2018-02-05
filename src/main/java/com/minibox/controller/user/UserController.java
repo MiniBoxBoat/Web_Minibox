@@ -1,231 +1,70 @@
 package com.minibox.controller.user;
 
 import com.aliyuncs.exceptions.ClientException;
-import com.minibox.dto.UserDto;
-import com.minibox.exception.*;
-import com.minibox.po.User;
-import com.minibox.po.VerifyCode;
-import com.minibox.service.user.UserService;
-import org.omg.PortableServer.THREAD_POLICY_ID;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import util.JsonUtil;
-import util.MapUtil;
+import com.minibox.dto.ResponseEntity;
+import com.minibox.po.UserPo;
+import com.minibox.po.VerifyCodePo;
+import com.minibox.service.UserService;
+import com.minibox.vo.UserVo;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.io.UnsupportedEncodingException;
+
+import static com.minibox.constants.RequestResult.SUCCESS;
+
 
 /**
  * @author MEI
  */
-@Controller
-@RequestMapping("/user")
+@RestController()
+@RequestMapping("user")
 public class UserController {
 
-    private static final String EXCEPTION_STR2 = "key 'phone_number'";
-
-    @Resource
+    @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/register.do", method = RequestMethod.POST)
-    public void register(User user, String verifyCode, HttpServletRequest request) {
-        Map map;
-        try {
-            UserDto user1 = userService.addUser(user, verifyCode, request);
-            if (user1 == null) {
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "注册成功", user1);
-            JsonUtil.toJSON(map);
-        } catch (DuplicateKeyException e) {
-            if (e.getMessage().contains(EXCEPTION_STR2)) {
-                map = MapUtil.toMap(409, "手机号已经被注册过了", null);
-                JsonUtil.toJSON(map);
-            } else {
-                map = MapUtil.toMap(409, "用户名已经被注册过了", null);
-                JsonUtil.toJSON(map);
-            }
-        } catch (ParameterException | ParameterIsNullException e) {
-            map = MapUtil.toMap(403, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch(VerifyCodeException e){
-            map = MapUtil.toMap(401, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
+    @PostMapping("register.do")
+    public ResponseEntity<UserVo> register(UserPo user, String verifyCode) {
+        UserVo userVo = userService.addUserAndCheckVerifyCode(user, verifyCode);
+        return new ResponseEntity<>(200, SUCCESS, userVo);
     }
 
-    @RequestMapping(value = "login.do", method = RequestMethod.POST)
-    public void login(String phoneNumber, String password) {
-        Map map;
-        try {
-            UserDto user = userService.checkUser(phoneNumber, password);
-            if (user == null) {
-                throw new UserIsNullException();
-            }
-
-            map = MapUtil.toMap(200, "登录成功", user);
-            JsonUtil.toJSON(map);
-            return;
-        } catch (UserNotExistException | ParameterException | PasswordFailedException e) {
-            map = MapUtil.toMap(401, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch (UserIsNullException e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        } catch (Exception e) {
-            e.printStackTrace();
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
+    @PostMapping("login.do")
+    public ResponseEntity<UserVo> login(String phoneNumber, String password) {
+        UserVo user = userService.checkUser(phoneNumber, password);
+        return new ResponseEntity<>(200, SUCCESS, user);
     }
 
-    @RequestMapping(value = "/showUserInfo.do", method = RequestMethod.GET)
-    public void showUserInfo(int userId) {
-        Map map;
-        try {
-            UserDto user = userService.getUserInfo(userId);
-            if (user == null) {
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "获取数据成功", user);
-            JsonUtil.toJSON(map);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
+    @PostMapping("showUserInfo.do")
+    public ResponseEntity<UserVo> showUserInfo(String taken) {
+        UserVo user = userService.getUserInfoByUserId(taken);
+        return new ResponseEntity<>(200, SUCCESS, user);
     }
 
-
-    @RequestMapping(value = "/updateUserInfo.do", method = RequestMethod.POST)
-    public void updateUserInfo(User user) {
-        Map map;
-        try {
-            userService.checkTaken(user.getTaken());
-            if (!userService.updateUser(user)) {
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "修改信息成功", null);
-            JsonUtil.toJSON(map);
-        } catch (TakenVirifyException e) {
-            map = MapUtil.toMap(401, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch (ParameterException | ParameterIsNullException e) {
-            map = MapUtil.toMap(403, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch (Exception e) {
-            e.printStackTrace();
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
+    @PostMapping("updateUserInfo.do")
+    public ResponseEntity<Object> updateUserInfo(UserPo user,String taken) {
+        userService.updateUser(user, taken);
+        return new ResponseEntity<>(200, SUCCESS, null);
     }
 
-
-    @RequestMapping(value = "/sendSms.do", method = RequestMethod.POST)
-    public void sendSms(String phoneNumber, HttpServletRequest request) {
-        Map map;
-        try {
-            String code = userService.sendSms(phoneNumber, request);
-            if (!userService.addVerifyCodeRe(new VerifyCode(phoneNumber, code))){
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "请求验证码成功", code);
-            JsonUtil.toJSON(map);
-        } catch (ClientException e) {
-            map = MapUtil.toMap(400, "客户端请求错误", null);
-            JsonUtil.toJSON(map);
-        } catch (SendSmsFailedException e) {
-            e.printStackTrace();
-            map = MapUtil.toMap(400, "客户端请求失败", null);
-            JsonUtil.toJSON(map);
-        } catch (ParameterException e) {
-            map = MapUtil.toMap(401, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch (Exception e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
+    @PostMapping("sendSms.do")
+    public ResponseEntity<String> sendSms(String phoneNumber) throws ClientException {
+        String code = userService.sendSms(phoneNumber);
+        userService.addVerifyCodeRe(new VerifyCodePo(phoneNumber, code));
+        return new ResponseEntity<>(200, SUCCESS, code);
     }
 
-    @RequestMapping(value = "checkVerifyCode.do", method = RequestMethod.POST)
-    public void checkVerifyCode(String code, HttpServletRequest request) {
-        Map map;
-        try {
-            if (!code.equals(request.getSession().getAttribute("code"))) {
-                throw new VerifyCodeException();
-            }
-            map = MapUtil.toMap(200, "验证码正确", null);
-            JsonUtil.toJSON(map);
-        } catch (VerifyCodeException e) {
-            map = MapUtil.toMap(400, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        }
+    @PostMapping("updateAvatar.do")
+    public ResponseEntity<Object> updateAvatar(String taken, String avatarUrl) {
+        userService.updateAvatar(taken, avatarUrl);
+        return new ResponseEntity<>(200, SUCCESS, null);
     }
 
-/*    @RequestMapping(value = "/updateAvatar.do", method = RequestMethod.POST)
-    public void updateAvatar(int userId, @RequestParam("file") CommonsMultipartFile file, HttpServletRequest request) {
-        Map map;
-        try {
-            if (!userService.updateUserAvatar(request, file, userId)){
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "修改头像成功", null);
-            JsonUtil.toJSON(map);
-        } catch (Exception e){
-            map = MapUtil.toMap(500, "服务器错误!!!!!!", e.getStackTrace());
-            JsonUtil.toJSON(map);
-        }
-    }*/
-
-    @RequestMapping(value = "/updateAvatar.do",method = RequestMethod.POST)
-    public void updateAvatar(int userId, String avatarUrl){
-        Map map;
-        try {
-            if (!userService.updateAvatar(userId, avatarUrl)){
-                throw new Exception("服务器错误");
-            }
-            map = MapUtil.toMap(200, "修改头像成功", null);
-            JsonUtil.toJSON(map);
-        }catch (Exception e){
-            map = MapUtil.toMap(500, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        }
+    @PostMapping("updatePassword.do")
+    public ResponseEntity<Object> updatePassword(String newPassword, String taken) {
+        userService.updatePassword(newPassword, taken);
+        return new ResponseEntity<>(200, SUCCESS, null);
     }
-
-    @RequestMapping(value = "/updatePassword.do", method = RequestMethod.POST)
-    public void updatePassword(String newPassword, String taken) {
-        Map map;
-        try {
-            int userId = userService.getTakenUserId(taken);
-            userService.checkTaken(taken);
-            if (!userService.updatePassword(newPassword, userId, taken)) {
-                throw new Exception();
-            }
-            map = MapUtil.toMap(200, "修改密码成功", null);
-            JsonUtil.toJSON(map);
-        } catch (ParameterException e) {
-            map = MapUtil.toMap(400, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch (TakenVirifyException e) {
-            map = MapUtil.toMap(401, e.getMessage(), null);
-            JsonUtil.toJSON(map);
-        } catch (Exception e) {
-            map = MapUtil.toMap(500, "服务器错误", null);
-            JsonUtil.toJSON(map);
-        }
-    }
-
-
 }

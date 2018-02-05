@@ -1,39 +1,59 @@
 package service;
 
-import com.minibox.dto.UserDto;
-import com.minibox.exception.*;
-import com.minibox.po.User;
-import com.minibox.service.user.UserService;
-import org.junit.Assert;
+import com.minibox.conf.MvcConfig;
+import com.minibox.po.UserPo;
+import com.minibox.service.UserService;
+import com.minibox.vo.UserVo;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.annotation.Resource;
+import org.springframework.test.context.web.WebAppConfiguration;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:springConfig.xml")
+@ContextConfiguration(classes = MvcConfig.class)
+@WebAppConfiguration
+@ActiveProfiles("dev")
 public class UserServiceTest {
 
-    @Resource
+    @Autowired
     private UserService userService;
+    private UserPo user;
 
-    @Test
-    public void updateTakenTest() throws PasswordFailedException, ServerException, UserNotExistException, ParameterException {
-        UserDto userDto = userService.checkUser("15808060138","123456");
-        Assert.assertEquals(userDto.getUserName(), "mei1");
-    }
-
-    @Test
-    public void updateUserTest() throws ParameterException, ParameterIsNullException {
-        User user = new User();
-        user.setUserId(111);
-        user.setUserName("mei1");
-        user.setPhoneNumber("15808060138");
+    @Before
+    public void before(){
+        user = new UserPo();
+        user.setUserName("yj");
+        user.setPassword("1234564");
+        user.setPhoneNumber("15808060137");
+        user.setSex("男");
         user.setEmail("1058752198@qq.com");
-        user.setTaken("eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjExMX0.ZzY4BrEHo37bGWLSZK9LI-glCXHkqtl7zC3aEADXvkU");
-        user.setTrueName("梅勇杰1");
     }
+
+    @Test
+    public void addUserAndCheckVerifyCodeTest(){
+        UserVo userVo =  userService.addUserAndCheckVerifyCode(user, "111111");
+        assertEquals("yj",userVo.getUserName());
+    }
+
+    @Test
+    public void checkUserTest(){
+        UserVo userVo = userService.checkUser("18500944413",
+                "e10adc3949ba59abbe56e057f20f883e");
+        assertEquals("zzq", userVo.getUserName());
+    }
+
+/*
+    @Test
+    public void getUserInfoByUserIdTest(){
+        UserVo userVo = userService.getUserInfoByUserId()
+    }
+*/
+
+
 
 }

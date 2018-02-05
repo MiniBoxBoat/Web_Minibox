@@ -1,56 +1,79 @@
 package dao;
 
 
+import com.minibox.conf.MvcConfig;
 import com.minibox.dao.ReservationMapper;
-import com.minibox.po.Reservation;
+import com.minibox.po.ReservationPo;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import static util.Print.*;
+import org.springframework.test.context.web.WebAppConfiguration;
 
-import javax.annotation.Resource;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:springConfig.xml")
+@ContextConfiguration(classes = MvcConfig.class)
+@WebAppConfiguration
+@ActiveProfiles("dev")
 public class ReservationTest {
 
-    @Resource
-    ReservationMapper reservationMapper;
+    @Autowired
+    private ReservationMapper reservationMapper;
+    private ReservationPo reservation;
 
-
-    @Test
-    public void addReservationTest(){
-        Reservation reservation = new Reservation();
+    @Before
+    public void before() {
+        reservation = new ReservationPo();
         reservation.setBoxId(102);
-        reservation.setOpenTime("2017-10-5 10:05");
+        reservation.setOpenTime("2018-10-5 10:05:00");
         reservation.setBoxSize("小");
         reservation.setPhoneNumber("15808060138");
         reservation.setUserName("mei");
         reservation.setUseTime(3);
-        boolean flag = reservationMapper.insertReservation(reservation);
-        Assert.assertEquals(true, flag);
-
     }
 
     @Test
-    public void removeReservationTest(){
-        boolean flag = reservationMapper.removeReservation(15);
-        Assert.assertEquals(flag, true);
+    public void addReservationTest() {
+        Assert.assertEquals(true, reservationMapper.insertReservation(reservation));
     }
 
     @Test
-    public void findReservationByReservationId(){
-        Reservation reservation = reservationMapper.findReservationByReservationId(32);
-        printnb(reservation.getOpenTime());
+    public void removeReservationTest() {
+        boolean flag = reservationMapper.removeReservationByReservationId(124);
+        assertEquals(true, flag);
     }
 
     @Test
-    public void findReservationByUserId(){
-        List<Reservation> reservations = reservationMapper.findReservationsByUserId(111);
+    public void updateReservation() {
+        reservation.setReservationId(124);
+        boolean flag = reservationMapper.updateReservation(reservation);
+        assertEquals(true, flag);
+    }
+
+    @Test
+    public void findReservationByReservationId() {
+        ReservationPo reservation = reservationMapper.findReservationByReservationId(124);
+        assertEquals(133, reservation.getUserId());
+    }
+
+    @Test
+    public void findReservationByUserId() {
+        List<ReservationPo> reservations = reservationMapper.findReservationsByUserId(135);
         Assert.assertEquals(1, reservations.size());
-        printnb(reservations.get(0).getOpenTime());
     }
+
+    @Test
+    public void findReservationByBoxIdTest() {
+        ReservationPo reservation = reservationMapper.findReservationByBoxId(102);
+        assertEquals(0, reservation.getGroupId());
+    }
+
+
 }
