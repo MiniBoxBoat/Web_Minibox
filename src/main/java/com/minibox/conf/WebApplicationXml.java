@@ -1,5 +1,6 @@
 package com.minibox.conf;
 
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -32,7 +33,7 @@ public class WebApplicationXml extends AbstractAnnotationConfigDispatcherServlet
     //用于配置WebApplicationContext中的Bean，这里面的Bean可以用来共享，但是这里没有意义因为只有一个Dispatcher
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class[]{RootContextConfig.class};
+        return new Class[]{RootContextConfig.class, CachingConfig.class};
     }
 
     //用于配置Dispatcher的context的Bean

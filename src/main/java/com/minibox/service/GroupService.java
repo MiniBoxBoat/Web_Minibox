@@ -6,6 +6,7 @@ import com.minibox.exception.ParameterException;
 import com.minibox.po.GroupPo;
 import com.minibox.vo.GroupVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.minibox.util.Distance;
 
@@ -22,6 +23,7 @@ public class GroupService {
     @Autowired
     private BoxMapper boxMapper;
 
+    @Cacheable("miniboxCache")
     public List<GroupVo> getGroupByDestination(String destination) {
         String destinationSql = "%" + destination + "%";
         List<GroupPo> groupPos = groupMapper.findGroupsByDestination(destinationSql);
@@ -35,6 +37,7 @@ public class GroupService {
         return groupPosToGroupVos(filerGroupPos);
     }
 
+    @Cacheable("miniboxCache")
     public GroupVo getGroupByGroupId(int groupId) {
         GroupPo groupPo = groupMapper.findGroupByGroupId(groupId);
         if (groupPo == null){

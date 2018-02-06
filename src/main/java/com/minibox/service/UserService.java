@@ -8,13 +8,15 @@ import com.minibox.exception.SendSmsFailedException;
 import com.minibox.exception.ServerException;
 import com.minibox.po.UserPo;
 import com.minibox.po.VerifyCodePo;
-import com.minibox.vo.UserVo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.minibox.util.FormatUtil;
 import com.minibox.util.JavaWebTaken;
 import com.minibox.util.RamdomNumberUtil;
 import com.minibox.util.Sms;
+import com.minibox.vo.UserVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
@@ -71,6 +73,7 @@ public class UserService {
         }
     }
 
+    @Cacheable("miniboxCache")
     public UserVo checkUser(String phoneNumber, String password){
         checkCheckUserParameters(phoneNumber);
         UserPo user = userMapper.findUserByPhoneNumber(phoneNumber);
@@ -93,6 +96,7 @@ public class UserService {
         }
     }
 
+    @Cacheable(value = "miniboxCache", key = "#{T(com.minibox.util.JavaWebTaken).getUserIdAndVerifyTakenFromTaken(#root.args[0])}")
     public UserVo getUserInfoByUserId(String taken) {
         int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
         UserPo userPo = userMapper.findUserByUserId(userId);
@@ -102,6 +106,7 @@ public class UserService {
         return userPoToUserVo(userPo);
     }
 
+    @CacheEvict(value = "miniboxCache", key ="#{T(com.minibox.util.JavaWebTaken).getUserIdAndVerifyTakenFromTaken(#root.args[1])}")
     public void updateUser(UserPo user,String taken) {
         int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
         UserPo userGetByUserId = userMapper.findUserByUserId(userId);

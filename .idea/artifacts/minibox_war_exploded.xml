@@ -47,6 +47,8 @@
           <element id="library" level="project" name="Maven: com.github.1991wangliang:aliyun-java-sdk-dysmsapi:1.0.0" />
           <element id="library" level="project" name="Maven: com.h2database:h2:1.4.196" />
           <element id="library" level="project" name="Maven: com.alibaba:fastjson:1.2.4" />
+          <element id="library" level="project" name="Maven: net.sf.ehcache:ehcache:2.10.4" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-context-support:4.1.4.RELEASE" />
         </element>
       </element>
       <element id="directory" name="META-INF">
