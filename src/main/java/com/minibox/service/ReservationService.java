@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.minibox.util.FormatUtil;
-import com.minibox.util.JavaWebTaken;
+import com.minibox.util.JavaWebToken;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -49,7 +49,7 @@ public class ReservationService {
     @Transactional(rollbackFor = Exception.class)
     public void addReservationsAndUpdateBoxesStatusAndReduceGroupBoxNum(ReservationDto reservationDto
             , String taken) {
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         checkAddReservationParameter(reservationDto);
         List<Integer> canUseBoxesId = getCanUseBoxesId(reservationDto);
 
@@ -131,7 +131,7 @@ public class ReservationService {
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteReservationAndAddOrderAndUpdateBoxStatusAndUpdateUseTime(int reservationId, String taken) {
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         ReservationPo reservation = reservationMapper.findReservationByReservationId(reservationId);
         Objects.requireNonNull(reservation, "reservationId有误");
         GroupPo group = groupMapper.findGroupByGroupId(reservation.getGroupId());
@@ -176,7 +176,7 @@ public class ReservationService {
     }
 
     public List<ReservationPo> getReservation(String taken) {
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         return reservationMapper.findReservationsByUserId(userId);
     }
 }

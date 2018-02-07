@@ -9,7 +9,7 @@ import com.minibox.po.OrderPo;
 import com.minibox.vo.BoxVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.minibox.util.JavaWebTaken;
+import com.minibox.util.JavaWebToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +31,13 @@ public class BoxService {
     private OrderMapper orderMapper;
 
     public List<BoxVo> getUsingBoxes(String taken){
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         List<BoxPo> boxPos = boxMapper.findUsingBoxesByUserId(userId);
         return boxPosConvertBoxVos(boxPos);
     }
 
     public List<BoxVo> getReservingBoxes(String taken) {
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         List<BoxPo> boxPos = boxMapper.findReservingBoxedByUserId(userId);
         return boxPosConvertBoxVos(boxPos);
     }

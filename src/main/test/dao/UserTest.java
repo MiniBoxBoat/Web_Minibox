@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import com.minibox.util.JavaWebTaken;
+import com.minibox.util.JavaWebToken;
 
 import static org.junit.Assert.assertEquals;
 
@@ -77,7 +77,7 @@ public class UserTest {
 
     @Test
     public void updateTakenTest() {
-        String taken = JavaWebTaken.createJavaWebToken(132);
+        String taken = JavaWebToken.createJavaWebToken(132);
         boolean flag = userMapper.updateTakenByTakenAndUserId(taken, 132);
         Assert.assertEquals(flag, true);
     }

@@ -13,7 +13,7 @@ import com.minibox.po.UserPo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.minibox.util.JavaWebTaken;
+import com.minibox.util.JavaWebToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class OrderService {
 
     @Transactional(rollbackFor = Exception.class)
     public void addOrder(OrderDto orderDto, String taken) {
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         checkAddOrderParameters(orderDto);
         List<Integer> canUseBoxesId = getCanUseBoxesId(orderDto);
         UserPo user = userMapper.findUserByUserId(userId);

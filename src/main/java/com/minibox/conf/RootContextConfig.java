@@ -1,6 +1,11 @@
 package com.minibox.conf;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.alibaba.druid.filter.Filter;
+import com.alibaba.druid.filter.stat.StatFilter;
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.wall.WallConfig;
+import com.alibaba.druid.wall.WallFilter;
+import com.sdicons.json.validator.impl.predicates.Bool;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +21,13 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
-import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
-@PropertySource({"classpath:mysql.properties"})
+@PropertySource({"classpath:dbconfig.properties"})
 public class RootContextConfig {
 
     @Autowired
@@ -34,16 +41,41 @@ public class RootContextConfig {
 
     @Bean
     @Profile("pro")
-    public DataSource proDataSource() throws PropertyVetoException {
-        ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        dataSource.setJdbcUrl(env.getProperty("jdbc.url"));
-        dataSource.setDriverClass(env.getProperty("jdbc.driver"));
-        dataSource.setUser(env.getProperty("jdbc.username"));
+    public DataSource proDataSource() throws SQLException {
+        DruidDataSource dataSource = new DruidDataSource();
+
+        WallConfig wallConfig = new WallConfig();
+        wallConfig.setDir("META-INF/druid/wall/mysql");
+        WallFilter wallFilter = new WallFilter();
+        wallFilter.setDbType("mysql");
+        wallFilter.setConfig(wallConfig);
+        List<Filter> filters = new ArrayList<>();
+        filters.add(wallFilter);
+
+        StatFilter statFilter = new StatFilter();
+        statFilter.setSlowSqlMillis(10000);
+        statFilter.setLogSlowSql(true);
+        filters.add(statFilter);
+
+        dataSource.setProxyFilters(filters);
+
+        dataSource.setDriverClassName(env.getProperty("jdbc.driver"));
+        dataSource.setUrl(env.getProperty("jdbc.url"));
+        dataSource.setUsername(env.getProperty("jdbc.username"));
         dataSource.setPassword(env.getProperty("jdbc.password"));
-        dataSource.setInitialPoolSize(5);
-        dataSource.setAcquireIncrement(5);
-        dataSource.setMinPoolSize(1);
-        dataSource.setMaxPoolSize(20);
+//        dataSource.setFilters(env.getProperty("filters"));
+        dataSource.setMaxActive(Integer.parseInt(env.getProperty("maxActive")));
+        dataSource.setInitialSize(Integer.parseInt(env.getProperty("initialSize")));
+        dataSource.setMaxWait(Long.parseLong(env.getProperty("maxWait")));
+        dataSource.setMinIdle(Integer.parseInt(env.getProperty("minIdle")));
+        dataSource.setTimeBetweenEvictionRunsMillis(Long.parseLong(env.getProperty("timeBetweenEvictionRunsMillis")));
+        dataSource.setMinEvictableIdleTimeMillis(Long.parseLong(env.getProperty("minEvictableIdleTimeMillis")));
+        dataSource.setValidationQuery(env.getProperty("validationQuery"));
+        dataSource.setTestWhileIdle(Boolean.parseBoolean(env.getProperty("testWhileIdle")));
+        dataSource.setTestOnBorrow(Boolean.parseBoolean(env.getProperty("testOnBorrow")));
+        dataSource.setTestOnReturn(Boolean.parseBoolean(env.getProperty("testOnReturn")));
+        dataSource.setPoolPreparedStatements(Boolean.parseBoolean(env.getProperty("poolPreparedStatements")));
+        dataSource.setMaxOpenPreparedStatements(Integer.parseInt(env.getProperty("maxOpenPreparedStatements")));
         return dataSource;
     }
 

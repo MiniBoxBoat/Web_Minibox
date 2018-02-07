@@ -5,11 +5,9 @@ import com.minibox.exception.ParameterException;
 import com.minibox.exception.ServerException;
 import com.minibox.po.CouponPo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.minibox.util.FormatUtil;
-import com.minibox.util.JavaWebTaken;
+import com.minibox.util.JavaWebToken;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +25,7 @@ public class CouponService {
 
     public void addCoupon(CouponPo coupon, String taken) {
         checkAddCouponParameters(coupon);
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         coupon.setUserId(userId);
         if(!couponMapper.insertCoupon(coupon)){
             throw new ServerException();
@@ -52,7 +50,7 @@ public class CouponService {
     }
 
     public List<CouponPo> getCouponsByUserId(String taken) {
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         return couponMapper.findCouponsByUserId(userId);
     }
 }

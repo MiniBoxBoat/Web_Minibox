@@ -1,12 +1,12 @@
 package com.minibox.conf;
 
+import com.alibaba.druid.support.http.WebStatFilter;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-import javax.servlet.Filter;
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletRegistration;
+import javax.servlet.*;
+import java.util.Enumeration;
 
 //这个类会成为spring框架的入口   具体看spring实战139页
 public class WebApplicationXml extends AbstractAnnotationConfigDispatcherServletInitializer {

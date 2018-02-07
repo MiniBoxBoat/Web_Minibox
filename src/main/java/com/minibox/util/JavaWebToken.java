@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * @author MEI
  */
-public class JavaWebTaken {
+public class JavaWebToken {
 
     public static String TAKEN_USER_ID = "userId";
 
@@ -34,22 +34,20 @@ public class JavaWebTaken {
                 .signWith(SignatureAlgorithm.HS256, getKeyInstance()).compact();
     }
 
-    public static Map<String, Object> verifyJavaWebToken(String jwt) throws ServerException, TakenVerifyException {
+    public static Map<String, Object> verifyJavaWebToken(String jwt) throws TakenVerifyException {
         Map<String, Object> jwtClaims = null;
-
-
         try {
             jwtClaims = Jwts.parser().setSigningKey(getKeyInstance()).parseClaimsJws(jwt).getBody();
         } catch (ExpiredJwtException e) {
-            throw new TakenVerifyException();
+            throw new TakenVerifyException("token已经过期");
         } catch (UnsupportedJwtException e) {
-            throw new TakenVerifyException();
+            throw new TakenVerifyException("token不合标准");
         } catch (MalformedJwtException e) {
-            throw new TakenVerifyException();
+            throw new TakenVerifyException("token错误");
         } catch (SignatureException e) {
-            throw new TakenVerifyException();
+            throw new TakenVerifyException("token的签名有误");
         } catch (IllegalArgumentException e) {
-            throw new TakenVerifyException();
+            throw new TakenVerifyException("token错误");
         }
         return jwtClaims;
     }
@@ -58,5 +56,14 @@ public class JavaWebTaken {
         Map<String, Object> map = verifyJavaWebToken(taken);
         int userId = (int) map.get("userId");
         return userId;
+    }
+
+    public boolean isTokenTrue(String taken){
+        try {
+            verifyJavaWebToken(taken);
+        }catch (TakenVerifyException e) {
+            return false;
+        }
+        return true;
     }
 }

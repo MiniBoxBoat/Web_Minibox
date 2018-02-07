@@ -9,7 +9,7 @@ import com.minibox.exception.ServerException;
 import com.minibox.po.UserPo;
 import com.minibox.po.VerifyCodePo;
 import com.minibox.util.FormatUtil;
-import com.minibox.util.JavaWebTaken;
+import com.minibox.util.JavaWebToken;
 import com.minibox.util.RamdomNumberUtil;
 import com.minibox.util.Sms;
 import com.minibox.vo.UserVo;
@@ -73,7 +73,6 @@ public class UserService {
         }
     }
 
-    @Cacheable("miniboxCache")
     public UserVo checkUser(String phoneNumber, String password){
         checkCheckUserParameters(phoneNumber);
         UserPo user = userMapper.findUserByPhoneNumber(phoneNumber);
@@ -84,7 +83,7 @@ public class UserService {
             throw new ParameterException("密码输入错误", 400);
         }
         UserPo userPo = userMapper.findUserByPhoneNumberAndPassword(phoneNumber, password);
-        String taken = JavaWebTaken.createJavaWebToken(user.getUserId());
+        String taken = JavaWebToken.createJavaWebToken(user.getUserId());
         UserVo userVo = userPoToUserVo(userPo);
         userVo.setTaken(taken);
         return userVo;
@@ -96,9 +95,10 @@ public class UserService {
         }
     }
 
-    @Cacheable(value = "miniboxCache", key = "#{T(com.minibox.util.JavaWebTaken).getUserIdAndVerifyTakenFromTaken(#root.args[0])}")
+    @Cacheable(value = "miniboxCache",condition = "#{T(com.minibox.util.JavaWebToken).isTokenTrue(#root.args[0])}",
+            key = "#{T(com.minibox.util.JavaWebToken).getUserIdAndVerifyTakenFromTaken(#root.args[0])}")
     public UserVo getUserInfoByUserId(String taken) {
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         UserPo userPo = userMapper.findUserByUserId(userId);
         if (userPo == null){
             throw new ParameterException("没有找到该用户的资源", 404);
@@ -106,9 +106,9 @@ public class UserService {
         return userPoToUserVo(userPo);
     }
 
-    @CacheEvict(value = "miniboxCache", key ="#{T(com.minibox.util.JavaWebTaken).getUserIdAndVerifyTakenFromTaken(#root.args[1])}")
+    @CacheEvict(value = "miniboxCache", key ="#{T(com.minibox.util.JavaWebToken).getUserIdAndVerifyTakenFromTaken(#root.args[1])}")
     public void updateUser(UserPo user,String taken) {
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         UserPo userGetByUserId = userMapper.findUserByUserId(userId);
         if (userGetByUserId == null) {
             throw new ParameterException("没有找到该用户的资源", 404);
@@ -142,14 +142,14 @@ public class UserService {
     }
 
     public void updateAvatar(String taken, String avatarUrl){
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         if (!userMapper.updateAvatarByAvatarAndUserId(avatarUrl, userId)){
             throw new ServerException();
         }
     }
 
     public void updatePassword(String newPassword, String taken){
-        int userId = JavaWebTaken.getUserIdAndVerifyTakenFromTaken(taken);
+        int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         if (newPassword.length()<5){
             throw new ParameterException("密码不要小于五个字符", 400);
         }
