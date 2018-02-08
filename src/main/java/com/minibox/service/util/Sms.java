@@ -1,4 +1,4 @@
-package com.minibox.util;
+package com.minibox.service.util;
 
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;

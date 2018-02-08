@@ -1,7 +1,6 @@
-package com.minibox.util;
+package com.minibox.service.util;
 
-import com.minibox.exception.ServerException;
-import com.minibox.exception.TakenVerifyException;
+import com.minibox.exception.TokenVerifyException;
 import io.jsonwebtoken.*;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -34,20 +33,20 @@ public class JavaWebToken {
                 .signWith(SignatureAlgorithm.HS256, getKeyInstance()).compact();
     }
 
-    public static Map<String, Object> verifyJavaWebToken(String jwt) throws TakenVerifyException {
+    public static Map<String, Object> verifyJavaWebToken(String jwt) throws TokenVerifyException {
         Map<String, Object> jwtClaims = null;
         try {
             jwtClaims = Jwts.parser().setSigningKey(getKeyInstance()).parseClaimsJws(jwt).getBody();
         } catch (ExpiredJwtException e) {
-            throw new TakenVerifyException("token已经过期");
+            throw new TokenVerifyException();
         } catch (UnsupportedJwtException e) {
-            throw new TakenVerifyException("token不合标准");
+            throw new TokenVerifyException();
         } catch (MalformedJwtException e) {
-            throw new TakenVerifyException("token错误");
+            throw new TokenVerifyException();
         } catch (SignatureException e) {
-            throw new TakenVerifyException("token的签名有误");
+            throw new TokenVerifyException();
         } catch (IllegalArgumentException e) {
-            throw new TakenVerifyException("token错误");
+            throw new TokenVerifyException();
         }
         return jwtClaims;
     }
@@ -61,7 +60,7 @@ public class JavaWebToken {
     public boolean isTokenTrue(String taken){
         try {
             verifyJavaWebToken(taken);
-        }catch (TakenVerifyException e) {
+        }catch (TokenVerifyException e) {
             return false;
         }
         return true;

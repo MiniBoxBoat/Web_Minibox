@@ -13,13 +13,14 @@ import com.minibox.po.UserPo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.minibox.util.JavaWebToken;
+import com.minibox.service.util.JavaWebToken;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.minibox.constants.BoxSize.LARGE;
 import static com.minibox.constants.BoxSize.SMALL;
+import static com.minibox.constants.ExceptionMessage.*;
+import static com.minibox.service.util.ServiceExceptionChecking.checkBoxSizeIsTrue;
 
 @Service
 public class OrderService {
@@ -56,7 +57,7 @@ public class OrderService {
         if (orderDto.getSize().equals(SMALL.size())) {
             List<BoxPo> smallBoxPos = boxMapper.findEmptySmallBoxByGroupId(orderDto.getGroupId());
             if (smallBoxPos.size() == 0) {
-                throw new ParameterException("箱子已经用完", 400);
+                throw new ParameterException(NO_BOX);
             }
             for (int i = 0; i < orderDto.getBoxNum(); i++) {
                 boxIdList.add(smallBoxPos.get(i).getBoxId());
@@ -64,7 +65,7 @@ public class OrderService {
         } else {
             List<BoxPo> largeBoxPos = boxMapper.findEmptyLargeBoxByGroupId(orderDto.getGroupId());
             if (largeBoxPos.size() == 0) {
-                throw new ParameterException("箱子已经用完", 400);
+                throw new ParameterException(NO_BOX);
             }
             for (int i = 0; i < orderDto.getBoxNum(); i++) {
                 boxIdList.add(largeBoxPos.get(i).getBoxId());
@@ -76,11 +77,9 @@ public class OrderService {
     private void checkAddOrderParameters(OrderDto orderDto) {
         if (orderDto.getGroupId() == null || orderDto.getSize() == null
                 || orderDto.getBoxNum() == null) {
-            throw new ParameterException("参数没有填写完整", 400);
+            throw new ParameterException(PARAMETER_IS_NOT_FULL);
         }
-        if (!orderDto.getSize().equals(SMALL.size()) && !orderDto.getSize().equals(LARGE.size())) {
-            throw new ParameterException("size 参数只能够是 \"大\" 或者 \"小\"", 400);
-        }
+        checkBoxSizeIsTrue(orderDto.getSize());
     }
 
     private OrderPo orderDtoToOrderPo(OrderDto orderDto, int userId) {

@@ -2,17 +2,18 @@ package com.minibox.service;
 
 import com.minibox.dao.BoxMapper;
 import com.minibox.dao.GroupMapper;
-import com.minibox.exception.ParameterException;
 import com.minibox.po.GroupPo;
+import com.minibox.util.Distance;
 import com.minibox.vo.GroupVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import com.minibox.util.Distance;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import static com.minibox.constants.ExceptionMessage.*;
 
 @Service
 public class GroupService {
@@ -40,9 +41,7 @@ public class GroupService {
     @Cacheable("miniboxCache")
     public GroupVo getGroupByGroupId(int groupId) {
         GroupPo groupPo = groupMapper.findGroupByGroupId(groupId);
-        if (groupPo == null){
-            throw new ParameterException("groupId 有误", 404);
-        }
+        Objects.requireNonNull(groupPo, RESOURCE_NOT_FOUND);
         return  groupPoToGroupVo(groupPo);
     }
 

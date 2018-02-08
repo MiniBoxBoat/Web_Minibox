@@ -13,7 +13,7 @@ public class ReservationTest {
     private ReservationService rs;
 
     @Test
-    public void deleteReservationAndAddOrderTest() throws TakenVerifyException, BoxIsBusyException, RollbackException {
+    public void deleteReservationAndAddOrderTest() throws TokenVerifyException, BoxIsBusyException, RollbackException {
         rs.deleteReservationAndAddOrder(32,"eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTI5OTkwNjEwOTIsInVzZXJJZCI6MTExfQ.jVlIxZlRL-YUPWT_FJ7cC8uAjpyYo3YmPNy3HcjOi2o");
     }*/
 }

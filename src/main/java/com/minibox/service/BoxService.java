@@ -9,11 +9,12 @@ import com.minibox.po.OrderPo;
 import com.minibox.vo.BoxVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.minibox.util.JavaWebToken;
+import com.minibox.service.util.JavaWebToken;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import static com.minibox.constants.ExceptionMessage.*;
 
 /**
  * @author MEI
@@ -46,7 +47,7 @@ public class BoxService {
         List<BoxVo> boxVos = new ArrayList<>();
         boxPos.forEach(boxPo -> {
             OrderPo orderPo = orderMapper.findOrderByBoxId(boxPo.getBoxId());
-            Objects.requireNonNull(orderPo, "通过boxId找不到order");
+            Objects.requireNonNull(orderPo, RESOURCE_NOT_FOUND);
             BoxVo boxVo = boxConvert(boxPo, orderPo.getOrderTime());
             boxVos.add(boxVo);
         });

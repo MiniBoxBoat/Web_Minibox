@@ -1,4 +1,4 @@
-package com.minibox.util;
+package com.minibox.service.util;
 
 /**
  * @author MEI

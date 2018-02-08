@@ -4,7 +4,6 @@ import com.minibox.dao.*;
 import com.minibox.dto.ReservationDto;
 import com.minibox.exception.ParameterException;
 import com.minibox.exception.RollbackException;
-import com.minibox.exception.ServerException;
 import com.minibox.po.BoxPo;
 import com.minibox.po.GroupPo;
 import com.minibox.po.OrderPo;
@@ -12,16 +11,15 @@ import com.minibox.po.ReservationPo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.minibox.util.FormatUtil;
-import com.minibox.util.JavaWebToken;
+import com.minibox.service.util.JavaWebToken;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.minibox.constants.BoxSize.SMALL;
+import static com.minibox.constants.BoxSize.*;
+import static com.minibox.constants.ExceptionMessage.*;
+import static com.minibox.service.util.ServiceExceptionChecking.*;
 
 /**
  * `
@@ -62,9 +60,7 @@ public class ReservationService {
                 reservationDto.getBoxNum());
         boolean successUpdateAllUseBoxesStatus = canUseBoxesId.stream()
                 .allMatch(boxId -> boxMapper.updateBoxStatus(boxId));
-        if (!successInsert || !successReduceGroupBoxNum || !successUpdateAllUseBoxesStatus) {
-            throw new RollbackException();
-        }
+        checkSqlExcute(successInsert && successReduceGroupBoxNum && successUpdateAllUseBoxesStatus);
     }
 
     private List<Integer> getCanUseBoxesId(ReservationDto reservationDto) {
@@ -72,7 +68,7 @@ public class ReservationService {
         if (reservationDto.getBoxSize().equals(SMALL.size())) {
             List<BoxPo> smallBoxPos = boxMapper.findEmptySmallBoxByGroupId(reservationDto.getGroupId());
             if (smallBoxPos.size() == 0) {
-                throw new ParameterException("箱子已经用完", 400);
+                throw new ParameterException(NO_BOX);
             }
             for (int i = 0; i < reservationDto.getBoxNum(); i++) {
                 boxIdList.add(smallBoxPos.get(i).getBoxId());
@@ -80,7 +76,7 @@ public class ReservationService {
         } else {
             List<BoxPo> largeBoxPos = boxMapper.findEmptyLargeBoxByGroupId(reservationDto.getGroupId());
             if (largeBoxPos.size() == 0) {
-                throw new ParameterException("箱子已经用完", 400);
+                throw new ParameterException(NO_BOX);
             }
             for (int i = 0; i < reservationDto.getBoxNum(); i++) {
                 boxIdList.add(largeBoxPos.get(i).getBoxId());
@@ -105,23 +101,17 @@ public class ReservationService {
         if (reservationDto.getUserName() == null || reservationDto.getOpenTime() == null ||
                 reservationDto.getUseTime() == null || reservationDto.getBoxSize() == null
                 || reservationDto.getPhoneNumber() == null || reservationDto.getGroupId() == 0) {
-            throw new ParameterException("请检查信息是否填写完整", 400);
+            throw new ParameterException(PARAMETER_IS_NOT_FULL);
         }
-        if (!FormatUtil.isPhoneNumberLegal(reservationDto.getPhoneNumber())) {
-            throw new ParameterException("手机号格式不正确", 400);
-        }
-        if (!FormatUtil.isTimePattern(reservationDto.getOpenTime())) {
-            throw new ParameterException("时间的格式有误， 按照 2018-01-01 12:00:00 这样来", 400);
-        }
-        if (isTimeIsAfterNow(reservationDto.getOpenTime())) {
-            throw new ParameterException("不能填写以前的时间", 400);
-        }
+        checkPhoneNumberIsTrue(reservationDto.getPhoneNumber());
+        checkTimeIsInPattern(reservationDto.getOpenTime());
+        checkTimeIsAfterNow(reservationDto.getOpenTime());
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteReservationByReservationId(int reservationId) {
         ReservationPo reservation = reservationMapper.findReservationByReservationId(reservationId);
-        Objects.requireNonNull(reservation, "输入的reservationId有误");
+        Objects.requireNonNull(reservation, RESOURCE_NOT_FOUND);
         boolean successRemoveReservation = reservationMapper.removeReservationByReservationId(reservationId);
         boolean successUpdateBoxStatus = boxMapper.updateBoxStatus(reservation.getBoxId());
         if (!successRemoveReservation || !successUpdateBoxStatus) {
@@ -133,46 +123,31 @@ public class ReservationService {
     public void deleteReservationAndAddOrderAndUpdateBoxStatusAndUpdateUseTime(int reservationId, String taken) {
         int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         ReservationPo reservation = reservationMapper.findReservationByReservationId(reservationId);
-        Objects.requireNonNull(reservation, "reservationId有误");
+        Objects.requireNonNull(reservation, RESOURCE_NOT_FOUND);
         GroupPo group = groupMapper.findGroupByGroupId(reservation.getGroupId());
 
         OrderPo orderPo = new OrderPo();
         orderPo.setGroupId(group.getGroupId());
         orderPo.setBoxId(reservation.getBoxId());
         orderPo.setUserId(userId);
-
-        if (!(reservationMapper.removeReservationByReservationId(reservationId)
+        checkSqlExcute((reservationMapper.removeReservationByReservationId(reservationId)
                 && orderMapper.insertOrder(orderPo)
                 && boxMapper.updateBoxStatus(reservation.getBoxId())
-                && userMapper.updateUseTime(userId))) {
-            throw new RollbackException();
-        }
+                && userMapper.updateUseTime(userId)));
     }
 
     public void updateReservation(ReservationPo reservation) {
         checkUpdateReservationParameter(reservation);
-        if (!reservationMapper.updateReservation(reservation)){
-            throw new ServerException();
-        }
-    }
-
-    private boolean isTimeIsAfterNow(String time) {
-        LocalDateTime dateTime = LocalDateTime.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        LocalDateTime dateNow = LocalDateTime.now();
-        return !dateTime.isAfter(dateNow);
+        checkSqlExcute(reservationMapper.updateReservation(reservation));
     }
 
     private void checkUpdateReservationParameter(ReservationPo reservation) {
         if (reservation.getUserName() == null || reservation.getOpenTime() == null || reservation.getUseTime() == 0
                 || reservation.getPhoneNumber() == null) {
-            throw new ParameterException("请检查信息是否填写完整", 400);
+            throw new ParameterException(PARAMETER_IS_NOT_FULL);
         }
-        if (isTimeIsAfterNow(reservation.getOpenTime())){
-            throw new ParameterException("开箱时间不能是以前的时间", 400);
-        }
-        if (!FormatUtil.isPhoneNumberLegal(reservation.getPhoneNumber())) {
-            throw new ParameterException("手机号格式不正确", 400);
-        }
+        checkTimeIsAfterNow(reservation.getOpenTime());
+        checkTimeIsInPattern(reservation.getPhoneNumber());
     }
 
     public List<ReservationPo> getReservation(String taken) {

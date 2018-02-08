@@ -1,17 +1,14 @@
 package com.minibox.service;
 
 import com.minibox.dao.CouponMapper;
-import com.minibox.exception.ParameterException;
-import com.minibox.exception.ServerException;
 import com.minibox.po.CouponPo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.minibox.util.FormatUtil;
-import com.minibox.util.JavaWebToken;
+import com.minibox.service.util.JavaWebToken;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static com.minibox.service.util.ServiceExceptionChecking.*;
 
 /**
  * @author MEI
@@ -27,26 +24,16 @@ public class CouponService {
         checkAddCouponParameters(coupon);
         int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         coupon.setUserId(userId);
-        if(!couponMapper.insertCoupon(coupon)){
-            throw new ServerException();
-        }
+        checkSqlExcute(couponMapper.insertCoupon(coupon));
     }
 
     private void checkAddCouponParameters(CouponPo coupon){
-        if (!FormatUtil.isTimePattern(coupon.getDeadlineTime())){
-            throw new ParameterException("时间格式不正确", 400);
-        }
-        LocalDateTime localDateTime = LocalDateTime.parse(coupon.getDeadlineTime(),
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        if (localDateTime.isBefore(LocalDateTime.now())){
-            throw new ParameterException("期限不能是以前的时间",400);
-        }
+        checkTimeIsInPattern(coupon.getDeadlineTime());
+        checkTimeIsAfterNow(coupon.getDeadlineTime());
     }
 
     public void deleteCoupon(int couponId) {
-        if (!couponMapper.removeCoupon(couponId)){
-            throw new ServerException();
-        }
+        checkSqlExcute(couponMapper.removeCoupon(couponId));
     }
 
     public List<CouponPo> getCouponsByUserId(String taken) {

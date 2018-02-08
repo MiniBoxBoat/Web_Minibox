@@ -1,4 +1,4 @@
-package com.minibox.util;
+package com.minibox.service.util;
 
 public class RamdomNumberUtil {
     public static String makeCode(){
