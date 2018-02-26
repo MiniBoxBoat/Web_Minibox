@@ -41,7 +41,7 @@ public class RootContextConfig {
 
     @Bean
     @Profile("pro")
-    public DataSource proDataSource() throws SQLException {
+    public DataSource proDataSource() {
         DruidDataSource dataSource = new DruidDataSource();
 
         WallConfig wallConfig = new WallConfig();
