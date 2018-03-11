@@ -6,13 +6,13 @@ import com.minibox.po.UserPo;
 import com.minibox.po.VerifyCodePo;
 import com.minibox.service.UserService;
 import com.minibox.vo.UserVo;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.UnsupportedEncodingException;
+import static com.minibox.constants.Constants.SUCCESS;
 
-import static com.minibox.constants.RequestResult.SUCCESS;
 
 
 /**
@@ -52,7 +52,6 @@ public class UserController {
     @PostMapping("sendSms.do")
     public ResponseEntity<String> sendSms(String phoneNumber) throws ClientException {
         String code = userService.sendSms(phoneNumber);
-        userService.addVerifyCodeRe(new VerifyCodePo(phoneNumber, code));
         return new ResponseEntity<>(200, SUCCESS, code);
     }
 
@@ -63,8 +62,8 @@ public class UserController {
     }
 
     @PostMapping("updatePassword.do")
-    public ResponseEntity<Object> updatePassword(String newPassword, String taken) {
-        userService.updatePassword(newPassword, taken);
+    public ResponseEntity<Object> updatePassword(String newPassword, String taken, String verifyCode) {
+        userService.updatePassword(newPassword, taken, verifyCode);
         return new ResponseEntity<>(200, SUCCESS, null);
     }
 }

@@ -57,7 +57,7 @@ public class JavaWebToken {
         return userId;
     }
 
-    public boolean isTokenTrue(String taken){
+    public static boolean isTokenTrue(String taken){
         try {
             verifyJavaWebToken(taken);
         }catch (TokenVerifyException e) {
@@ -65,4 +65,5 @@ public class JavaWebToken {
         }
         return true;
     }
+
 }

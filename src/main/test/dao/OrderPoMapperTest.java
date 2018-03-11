@@ -48,13 +48,13 @@ public class OrderPoMapperTest {
     @Test
     public void findOrderByOrderIdTest(){
         OrderPo orderPo = orderMapper.findOrderByOrderId(88);
-        assertEquals(100, orderPo.getGroupId());
+        assertEquals(1, orderPo.getGroupId());
     }
 
     @Test
     public void findOrderByBoxIdTest(){
-        OrderPo orderPo = orderMapper.findOrderByBoxId(637);
-        assertEquals(89, orderPo.getOrderId());
+        OrderPo orderPo = orderMapper.findOrderByBoxId(101);
+        assertEquals(88, orderPo.getOrderId());
     }
 
 }

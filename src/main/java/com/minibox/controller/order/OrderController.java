@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.minibox.constants.RequestResult.SUCCESS;
+import static com.minibox.constants.Constants.*;
+
 
 @RestController
 @RequestMapping("order")

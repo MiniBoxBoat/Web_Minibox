@@ -4,9 +4,7 @@ import com.minibox.dto.ReservationDto;
 import com.minibox.dto.ResponseEntity;
 import com.minibox.po.ReservationPo;
 import com.minibox.service.ReservationService;
-import com.minibox.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.minibox.constants.RequestResult.SUCCESS;
+import static com.minibox.constants.Constants.SUCCESS;
 
 /**
  * @author MEI

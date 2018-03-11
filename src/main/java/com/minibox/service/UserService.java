@@ -16,10 +16,13 @@ import com.minibox.vo.UserVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.BoundHashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
+import static com.minibox.constants.Constants.VERIFYCODE_HASH;
 import static com.minibox.constants.ExceptionMessage.*;
 import static com.minibox.service.util.ServiceExceptionChecking.*;
 
@@ -28,20 +31,33 @@ import static com.minibox.service.util.ServiceExceptionChecking.*;
  */
 @Service
 public class UserService {
-    public static final String SMS_SUCCESS_CODE = "OK";
+    private static final String SMS_SUCCESS_CODE = "OK";
 
     @Autowired
     private UserMapper userMapper;
 
+    private RedisTemplate<String, String> redisTemplate;
+
+    private BoundHashOperations<String, String, String> verifycode;
+
+    @Autowired
+    public void setRedisTemplate(RedisTemplate<String, String> redisTemplate){
+        this.redisTemplate = redisTemplate;
+        verifycode = redisTemplate.boundHashOps(VERIFYCODE_HASH);
+    }
+
     public UserVo addUserAndCheckVerifyCode(UserPo user,String verifyCode){
         checkUserIsDouble(user);
         checkAddUserAndCheckVerifyCodeParameters(user, verifyCode);
-        VerifyCodePo verifyCode1 = userMapper.findVerifyCode(user.getPhoneNumber());
-        Objects.requireNonNull(verifyCode1, RESOURCE_NOT_FOUND);
-        if (!verifyCode1.getVerifyCode().equals(verifyCode)){
+        String code = verifycode.get(user.getPhoneNumber());
+        if (code == null) {
             throw new TokenVerifyException();
         }
-        checkSqlExcute(userMapper.insertUser(user));
+        if (userMapper.insertUser(user)){
+            verifycode.delete(user.getPhoneNumber());
+        }else {
+            throw new ServerException();
+        }
         UserPo userPo = userMapper.findUserByUserNameAndPassword(user.getUserName(), user.getPassword());
         return userPoToUserVo(userPo);
     }
@@ -59,7 +75,6 @@ public class UserService {
         }
         checkUserNameIsTooLong(user.getUserName());
         checkPhoneNumberIsTrue(user.getPhoneNumber());
-        checkPasswordIsTooShortOrToolLong(user.getPassword());
         checkPhoneNumberIsUsed(userMapper.findUserByPhoneNumber(user.getPhoneNumber()));
     }
 
@@ -77,8 +92,9 @@ public class UserService {
         return userVo;
     }
 
-    @Cacheable(value = "miniboxCache",condition = "#{T(com.minibox.service.util.JavaWebToken).isTokenTrue(#root.args[0])}",
-            key = "#{T(com.minibox.service.util.JavaWebToken).getUserIdAndVerifyTakenFromTaken(#root.args[0])}")
+    @Cacheable(value = "miniboxCache",
+            condition = "T(com.minibox.service.util.JavaWebToken).isTokenTrue(#taken)",
+            key = "T(com.minibox.service.util.JavaWebToken).getUserIdAndVerifyTakenFromTaken(#taken)")
     public UserVo getUserInfoByUserId(String taken) {
         int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         UserPo userPo = userMapper.findUserByUserId(userId);
@@ -86,7 +102,8 @@ public class UserService {
         return userPoToUserVo(userPo);
     }
 
-    @CacheEvict(value = "miniboxCache", key ="#{T(com.minibox.service.util.JavaWebToken).getUserIdAndVerifyTakenFromTaken(#root.args[1])}")
+    @CacheEvict(value = "miniboxCache",
+            key ="T(com.minibox.service.util.JavaWebToken).getUserIdAndVerifyTakenFromTaken(#taken)")
     public void updateUser(UserPo user,String taken) {
         int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         UserPo userGetByUserId = userMapper.findUserByUserId(userId);
@@ -102,9 +119,7 @@ public class UserService {
         if (user.getUserName()==null || user.getEmail()==null || user.getSex()==null){
             throw new ParameterException(PARAMETER_IS_NOT_FULL);
         }
-        checkPhoneNumberIsTrue(user.getPhoneNumber());
         checkUserNameIsTooLong(user.getUserName());
-        checkPhoneNumberIsUsed(userMapper.findUserByPhoneNumber(user.getPhoneNumber()));
         checkUserNameIsUsed(userMapper.findUserByUserName(user.getUserName()));
         checkSexIsTrue(user.getSex());
     }
@@ -116,30 +131,27 @@ public class UserService {
         }
     }
 
-    public void updatePassword(String newPassword, String taken){
+    public void updatePassword(String newPassword, String taken, String verifyCode){
         int userId = JavaWebToken.getUserIdAndVerifyTakenFromTaken(taken);
         if (newPassword.length()<5){
             throw new ParameterException(PASSWORD_IS_TOO_SHORT);
         }
+
         if (!userMapper.updatePasswordByNewPasswordAndUserId(newPassword, userId)){
             throw new ServerException();
         }
     }
 
     public String sendSms(String phoneNumber) throws ClientException {
-        checkSendSmsParameters(phoneNumber);
         String code = RamdomNumberUtil.makeCode();
         SendSmsResponse sendSmsResponse = Sms.sendSms(phoneNumber, code);
         if (sendSmsResponse.getCode() == null || !sendSmsResponse.getCode().equals(SMS_SUCCESS_CODE)) {
             throw new SendSmsFailedException();
         }
+        verifycode.put(phoneNumber, code);
         return code;
     }
 
-    private void checkSendSmsParameters(String phoneNumber){
-        checkPhoneNumberIsTrue(phoneNumber);
-        checkPhoneNumberIsUsed(userMapper.findUserByPhoneNumber(phoneNumber));
-    }
 
     public void addVerifyCodeRe(VerifyCodePo verifyCode) {
         if (!userMapper.insertVerifyCode(verifyCode)){

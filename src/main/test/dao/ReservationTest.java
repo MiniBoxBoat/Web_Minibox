@@ -71,8 +71,8 @@ public class ReservationTest {
 
     @Test
     public void findReservationByBoxIdTest() {
-        ReservationPo reservation = reservationMapper.findReservationByBoxId(102);
-        assertEquals(0, reservation.getGroupId());
+        ReservationPo reservation = reservationMapper.findReservationByBoxId(932);
+        assertEquals(9, reservation.getGroupId());
     }
 
 

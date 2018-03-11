@@ -38,12 +38,12 @@ public class BoxMapperTest {
     @Test
     public void findUsingBoxesByUserIdTest(){
         List<BoxPo> usingBoxPos = boxMapper.findUsingBoxesByUserId(195);
-        assertEquals(6, usingBoxPos.size());
+        assertEquals(1, usingBoxPos.size());
     }
 
     @Test
     public void findReservingBoxedTest(){
-        List<BoxPo> reservingBoxPos = boxMapper.findReservingBoxedByUserId(0);
+        List<BoxPo> reservingBoxPos = boxMapper.findReservingBoxedByUserId(135);
         assertEquals(1, reservingBoxPos.size());
     }
 

@@ -10,9 +10,7 @@ import java.time.format.DateTimeFormatter;
 import static com.minibox.constants.BoxSize.LARGE;
 import static com.minibox.constants.BoxSize.SMALL;
 import static com.minibox.constants.ExceptionMessage.*;
-import static com.minibox.constants.Sex.FEMALE;
-import static com.minibox.constants.Sex.MALE;
-import static com.minibox.constants.TimePattern.TIME_PATTERN;
+import static com.minibox.constants.Constants.*;
 
 public class ServiceExceptionChecking {
 

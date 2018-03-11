@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.minibox.constants.RequestResult.SUCCESS;
+import static com.minibox.constants.Constants.*;
 
 /**
  * @author MEI

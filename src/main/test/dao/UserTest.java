@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = MvcConfig.class)
 @WebAppConfiguration
-@ActiveProfiles("pro")
+@ActiveProfiles("dev")
 public class UserTest {
 
     @Autowired
@@ -30,8 +30,8 @@ public class UserTest {
     public void before() {
         user = new UserPo();
         user.setEmail("1058752198@qq.com");
-        user.setPhoneNumber("15808060135");
-        user.setUserName("yj");
+        user.setPhoneNumber("15808060133");
+        user.setUserName("myj3");
         user.setTrueName("梅勇杰2");
         user.setSex("男");
     }
@@ -79,7 +79,7 @@ public class UserTest {
     public void updateTakenTest() {
         String taken = JavaWebToken.createJavaWebToken(132);
         boolean flag = userMapper.updateTakenByTakenAndUserId(taken, 132);
-        Assert.assertEquals(flag, true);
+        Assert.assertEquals(true, flag);
     }
 
     @Test
