@@ -65,7 +65,7 @@ public class ReservationTest {
 
     @Test
     public void findReservationByUserId() {
-        List<ReservationPo> reservations = reservationMapper.findReservationsByUserId(135);
+        List<ReservationPo> reservations = reservationMapper.findReservationsByUserId(165);
         Assert.assertEquals(1, reservations.size());
     }
 

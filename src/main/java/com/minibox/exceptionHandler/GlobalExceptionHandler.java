@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TokenVerifyException.class)
     public ResponseEntity<Object> handlerTokenVerifyException(TokenVerifyException e){
         e.printStackTrace();
-        return new ResponseEntity<>(TokenVerifyException.STATUS,AUTHENTICATION_FAILURE, e.getStackTrace());
+        return new ResponseEntity<>(TokenVerifyException.STATUS, AUTHENTICATION_FAILURE, e.getStackTrace());
     }
 
     @ExceptionHandler(VerifyCodeException.class)

@@ -133,3 +133,8 @@ VALUES (131, 'May', 'e10adc3949ba59abbe56e057f20f883e', NULL, '15808060138', '�
 INSERT INTO `verifycode` (`phone_number`, `verify_code`)
 VALUES ('15023188039', '543690'), ('15123905611', '197348'), ('15808060138', '302966'), ('18500944413', '135992'),
   ('18875143259', '719044'),('15808060137','111111');
+
+INSERT INTO minibox.transportation_info (transportation_id, user_id, start_place, end_place, name, phone_number,
+                                         receive_time, goods_type, company, transportation_comment, cost, score,
+                                         transportation_status, finished_flag, del_flag) VALUES (1, 1, '重庆', '上海',
+                                        'May', '15808060138', '2018-04-22 11:38:14', '衣服', '韵达', '尽快', 0.00, null, 0, 0, 0);

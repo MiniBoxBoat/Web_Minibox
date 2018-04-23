@@ -23,9 +23,7 @@ public class GroupController {
 
     @PostMapping("showBoxGroup.do")
     public ResponseEntity<List<GroupVo>> showBoxGroupByKeyWord(String destination) {
-        long start = System.currentTimeMillis();
         List<GroupVo> groupVos = groupService.getGroupByDestination(destination);
-        System.out.println(System.currentTimeMillis() - start);
         return new ResponseEntity<>(200, SUCCESS, groupVos);
     }
 

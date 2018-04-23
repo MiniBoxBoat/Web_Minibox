@@ -117,3 +117,28 @@ CREATE TABLE `verifycode` (
 );
 
 
+DROP TABLE IF EXISTS `transportation_info`;
+
+CREATE TABLE transportation_info
+(
+  transportation_id      INT AUTO_INCREMENT
+    PRIMARY KEY,
+  user_id                INT                 NOT NULL,
+  start_place            VARCHAR(50)         NOT NULL,
+  end_place              VARCHAR(50)         NOT NULL,
+  name                   VARCHAR(10)         NOT NULL,
+  phone_number           VARCHAR(11)         NOT NULL,
+  receive_time           DATE                NOT NULL,
+  goods_type             VARCHAR(100)        NOT NULL,
+  company                VARCHAR(50)         NOT NULL,
+  transportation_comment TEXT                NULL,
+  cost                   DECIMAL(5, 2)       NULL,
+  score                  INT                 NULL,
+  transportation_status  TINYINT DEFAULT '0' NULL
+  COMMENT '0 表示没有被运送 1 表示正在被运送 2 表示运送结束',
+  finished_flag          TINYINT DEFAULT '0' NULL
+  COMMENT '0 表示没有完成 1 用户已经确认完成',
+  del_flag               TINYINT DEFAULT '0' NULL
+)
+  ENGINE = InnoDB
+  CHARSET = utf8;

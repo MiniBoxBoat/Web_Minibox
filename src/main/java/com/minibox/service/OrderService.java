@@ -10,31 +10,32 @@ import com.minibox.exception.RollbackException;
 import com.minibox.po.BoxPo;
 import com.minibox.po.OrderPo;
 import com.minibox.po.UserPo;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.minibox.service.util.JavaWebToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.minibox.service.util.JavaWebToken;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.minibox.constants.BoxSize.SMALL;
-import static com.minibox.constants.ExceptionMessage.*;
+import static com.minibox.constants.ExceptionMessage.NO_BOX;
+import static com.minibox.constants.ExceptionMessage.PARAMETER_IS_NOT_FULL;
 import static com.minibox.service.util.ServiceExceptionChecking.checkBoxSizeIsTrue;
 
 @Service
 public class OrderService {
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
-    @Autowired
+    @Resource
     private BoxMapper boxMapper;
 
-    @Autowired
+    @Resource
     private GroupMapper groupMapper;
 
-    @Autowired
+    @Resource
     private OrderMapper orderMapper;
 
 

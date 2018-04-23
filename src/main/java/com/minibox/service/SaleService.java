@@ -7,15 +7,18 @@ import com.minibox.po.SalePo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+
 import static com.minibox.service.util.ServiceExceptionChecking.*;
 
 @Service
 public class SaleService {
 
-    @Autowired
+    @Resource
     private SaleMapper saleMapper;
 
-    @Autowired
+    @Resource
     private OrderMapper orderMapper;
 
     @Transactional(rollbackFor = Exception.class)

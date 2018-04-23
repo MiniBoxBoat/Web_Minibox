@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = MvcConfig.class)
 @WebAppConfiguration
-@ActiveProfiles("dev")
+@ActiveProfiles("pro")
 public class UserTest {
 
     @Autowired
@@ -38,8 +38,8 @@ public class UserTest {
 
     @Test
     public void insertUserTest() {
-        boolean flag = userMapper.insertUser(user);
-        assertEquals(true, flag);
+        userMapper.insertUser(user);
+        System.out.println(user.getUserId());
     }
 
     @Test

@@ -5,26 +5,25 @@ import com.minibox.dao.GroupMapper;
 import com.minibox.po.GroupPo;
 import com.minibox.util.Distance;
 import com.minibox.vo.GroupVo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import static com.minibox.constants.ExceptionMessage.*;
+
+import static com.minibox.constants.ExceptionMessage.RESOURCE_NOT_FOUND;
 
 @Service
 public class GroupService {
 
-    @Autowired
+    @Resource
     private GroupMapper groupMapper;
 
-    @Autowired
+    @Resource
     private BoxMapper boxMapper;
 
-    @Cacheable("miniboxCache")
     public List<GroupVo> getGroupByDestination(String destination) {
         String destinationSql = "%" + destination + "%";
         List<GroupPo> groupPos = groupMapper.findGroupsByDestination(destinationSql);
@@ -38,7 +37,6 @@ public class GroupService {
         return groupPosToGroupVos(filerGroupPos);
     }
 
-    @Cacheable("miniboxCache")
     public GroupVo getGroupByGroupId(int groupId) {
         GroupPo groupPo = groupMapper.findGroupByGroupId(groupId);
         Objects.requireNonNull(groupPo, RESOURCE_NOT_FOUND);
@@ -52,13 +50,14 @@ public class GroupService {
     }
 
     private GroupVo groupPoToGroupVo(GroupPo groupPo){
+        int emptySmallBoxCount = boxMapper.findEmptySmallBoxCountByGroupId(groupPo.getGroupId());
         return GroupVo.builder()
                 .position(groupPo.getPosition())
                 .quantity(groupPo.getQuantity())
                 .lng(groupPo.getLng())
                 .lat(groupPo.getLat())
                 .groupId(groupPo.getGroupId())
-                .emptyLargeBoxNum(boxMapper.findEmptySmallBoxCountByGroupId(groupPo.getGroupId()))
+                .emptySmallBoxNum(emptySmallBoxCount)
                 .emptyLargeBoxNum(boxMapper.findEmptyLargeBoxCountByGroupId(groupPo.getGroupId()))
                 .build();
     }

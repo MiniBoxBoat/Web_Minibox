@@ -24,4 +24,7 @@ public class ExceptionMessage {
 
     /*orderService*/
     public static final String BOX_SIZE_NOT_TRUE = "size 参数只能够是 \"大\" 或者 \"小\"";
+
+    /*redis*/
+    public static final String REDIS_NO_SOURCE = "redis 中资源不存在";
 }

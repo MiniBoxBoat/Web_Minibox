@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @PostMapping("updateUserInfo.do")
-    public ResponseEntity<Object> updateUserInfo(UserPo user,String taken) {
+    public ResponseEntity<Object> updateUserInfo(UserPo user,String taken) throws Exception {
         userService.updateUser(user, taken);
         return new ResponseEntity<>(200, SUCCESS, null);
     }
@@ -63,7 +63,7 @@ public class UserController {
 
     @PostMapping("updatePassword.do")
     public ResponseEntity<Object> updatePassword(String newPassword, String taken, String verifyCode) {
-        userService.updatePassword(newPassword, taken, verifyCode);
+        userService.updatePasswordAndCheckVerifyCode(newPassword, taken, verifyCode);
         return new ResponseEntity<>(200, SUCCESS, null);
     }
 }

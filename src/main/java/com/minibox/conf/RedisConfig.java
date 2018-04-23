@@ -9,8 +9,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class RedisConfig {
 
     @Bean
-    public JedisConnectionFactory jedisConnectionFactory(){
-        return new JedisConnectionFactory();
+    public JedisConnectionFactory redisConnectionFactory(){
+        JedisConnectionFactory jedisConnectionFactory =
+                new JedisConnectionFactory();
+        jedisConnectionFactory.afterPropertiesSet();
+        return jedisConnectionFactory;
     }
 
     @Bean

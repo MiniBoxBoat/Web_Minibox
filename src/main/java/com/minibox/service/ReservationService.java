@@ -8,16 +8,16 @@ import com.minibox.po.BoxPo;
 import com.minibox.po.GroupPo;
 import com.minibox.po.OrderPo;
 import com.minibox.po.ReservationPo;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.minibox.service.util.JavaWebToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.minibox.service.util.JavaWebToken;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.minibox.constants.BoxSize.*;
+import static com.minibox.constants.BoxSize.SMALL;
 import static com.minibox.constants.ExceptionMessage.*;
 import static com.minibox.service.util.ServiceExceptionChecking.*;
 
@@ -29,19 +29,19 @@ import static com.minibox.service.util.ServiceExceptionChecking.*;
 @Service
 public class ReservationService {
 
-    @Autowired
+    @Resource
     private ReservationMapper reservationMapper;
 
-    @Autowired
+    @Resource
     private BoxMapper boxMapper;
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
-    @Autowired
+    @Resource
     private GroupMapper groupMapper;
 
-    @Autowired
+    @Resource
     private OrderMapper orderMapper;
 
     @Transactional(rollbackFor = Exception.class)

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static com.minibox.constants.Constants.SUCCESS;
@@ -21,7 +22,7 @@ import static com.minibox.constants.Constants.SUCCESS;
 @RequestMapping("reservation")
 public class ReservationController {
 
-    @Autowired
+    @Resource
     private ReservationService reservationService;
 
     @PostMapping("reserve.do")

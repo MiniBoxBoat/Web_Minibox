@@ -2,10 +2,10 @@ package com.minibox.service;
 
 import com.minibox.dao.CouponMapper;
 import com.minibox.po.CouponPo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.minibox.service.util.JavaWebToken;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 import static com.minibox.service.util.ServiceExceptionChecking.*;
@@ -16,7 +16,7 @@ import static com.minibox.service.util.ServiceExceptionChecking.*;
 @Service
 public class CouponService {
 
-    @Autowired
+    @Resource
     private CouponMapper couponMapper;
 
 

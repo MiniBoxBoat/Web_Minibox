@@ -29,7 +29,7 @@
         phone_number, verify_code
     </sql>
 
-    <insert id="insertUser" parameterType="com.minibox.po.UserPo" keyColumn="user_id" useGeneratedKeys="true">
+    <insert id="insertUser" parameterType="com.minibox.po.UserPo" keyProperty="userId" useGeneratedKeys="true">
         INSERT INTO user_info (username, password, phone_number, sex, email)
         VALUES (#{userName}, #{password}, #{phoneNumber}, #{sex}, #{email})
     </insert>

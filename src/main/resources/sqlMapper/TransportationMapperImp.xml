@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.minibox.dao.TransportationMapper">
+
+    <resultMap id="transportation" type="com.minibox.po.Transportation">
+        <id property="transportationId" column="transportation_id" />
+        <result property="userId" column="user_id"/>
+        <result property="startPlace" column="start_place"/>
+        <result property="endPlace" column="end_place"/>
+        <result property="name" column="name"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="receiveTime" column="receive_time"/>
+        <result property="goodsType" column="goods_type"/>
+        <result property="company" column="company"/>
+        <result property="transportationComment" column="transportation_comment"/>
+        <result property="cost" column="cost"/>
+        <result property="score" column="score" />
+        <result property="transportationStatus" column="transportation_status"/>
+        <result property="finishedFlag" column="finished_flag"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <sql id="transportation_info_column">
+        transportation_id,user_id,start_place,end_place,name, phone_number,receive_time,
+        goods_type,company,transportation_comment,cost,score,transportation_status,finished_flag,del_flag
+    </sql>
+
+    <insert id="insertTransportation" parameterType="com.minibox.po.Transportation" keyProperty="transportationId" useGeneratedKeys="true">
+        INSERT INTO transportation_info
+        (user_id,start_place,end_place,name,phone_number,receive_time,
+        goods_type,company,transportation_comment,cost)
+        VALUES (#{userId}, #{startPlace}, #{endPlace}, #{name}, #{phoneNumber},
+        #{receiveTime}, #{goodsType}, #{company}, #{transportationComment}, #{cost})
+    </insert>
+
+    <delete id="removeTransportation" parameterType="java.lang.Integer">
+        UPDATE transportation_info
+        SET del_flag='1'
+        WHERE transportation_id=#{transportationId}
+    </delete>
+
+    <update id="updateTransportation" parameterType="com.minibox.po.Transportation">
+        UPDATE transportation_info
+        <set>
+            <if test="startPlace!=null">
+                start_place = #{startPlace},
+            </if>
+            <if test="endPlace =null">
+                end_place = #{endPlace},
+            </if>
+            <if test="name!=null">
+                name = #{name},
+            </if>
+            <if test="phoneNumber!=null">
+                phone_number = #{phoneNumber},
+            </if>
+            <if test="receiveTime!=null">
+                receive_time = #{receiveTime},
+            </if>
+            <if test="goodsType!=null">
+                goods_type = #{goodsType},
+            </if>
+            <if test="company!=null">
+                company = #{company},
+            </if>
+            <if test="transportationComment!=null">
+                transportation_comment = #{transportationComment},
+            </if>
+            <if test="cost!=null">
+                cost = #{cost},
+            </if>
+        </set>
+        WHERE transportation_id=#{transportationId}
+    </update>
+
+    <update id="updateTransportationScore">
+        UPDATE transportation_info
+        SET score=#{score}
+        WHERE transportation_id=#{transportationId}
+    </update>
+
+    <update id="updateTransportationFinishFlag" parameterType="java.lang.Integer">
+        UPDATE transportation_info
+        SET finished_flag='1'
+        WHERE transportation_id=#{transportationId}
+    </update>
+
+    <select id="findTransportationByTransportationId" parameterType="java.lang.Integer"
+            resultMap="transportation">
+        SELECT <include refid="transportation_info_column"/>
+        FROM transportation_info
+        WHERE transportation_id=#{transportationId}
+    </select>
+
+    <select id="findUsingTransportationInfosByUserId" parameterType="java.lang.Integer"
+            resultMap="transportation">
+        SELECT <include refid="transportation_info_column"/>
+        FROM transportation_info
+        WHERE user_id=#{userId} AND finished_flag='0'
+    </select>
+
+    <select id="findUsedTransportationInfosByUserId" parameterType="java.lang.Integer"
+            resultMap="transportation">
+        SELECT <include refid="transportation_info_column"/>
+        FROM transportation_info
+        WHERE user_id=#{userId} AND finished_flag='1'
+    </select>
+
+</mapper>

@@ -1,41 +1,60 @@
 package redis;
 
+import com.minibox.conf.CachingConfig;
 import com.minibox.conf.MvcConfig;
 import com.minibox.conf.RedisConfig;
-import org.junit.Assert;
+import com.minibox.redis.UserRedisImp;
+import com.minibox.vo.UserVo;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundHashOperations;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import static com.minibox.constants.Constants.VERIFYCODE_HASH;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RedisConfig.class)
+@ContextConfiguration(classes = {CachingConfig.class, MvcConfig.class, RedisConfig.class})
 @WebAppConfiguration
+@ActiveProfiles("dev")
 public class RedisTest {
 
-    @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private UserVo userVo;
 
-    @Test
-    public void test(){
-        BoundHashOperations<String, String, String> verifycodeHash =
-                redisTemplate.boundHashOps(VERIFYCODE_HASH);
-        verifycodeHash.put("15808060138","454545");
-        String code = verifycodeHash.get("15808060138");
-        Assert.assertEquals("454545", code);
+    @Autowired
+    private UserRedisImp userRedisImp;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    @Before
+    public void before() {
+        userVo = new UserVo.UserVoBuilder()
+                .userId(1)
+                .userName("mei")
+                .credibility(10)
+                .email("fdsf")
+                .image("fdfs")
+                .phoneNumber("fdsfs")
+                .sex("女")
+                .taken("fdsf")
+                .trueName("fdsdfd")
+                .useTime(2)
+                .build();
     }
 
     @Test
-    public void test2(){
-        HashOperations<String, String, String> verifycode = redisTemplate.opsForHash();
-        String code = verifycode.get(VERIFYCODE_HASH, "15808060138");
-        System.out.println(code);
+    public void test() {
+/*        userRedisImp.saveUser(userVo);
+        UserVo userVo1 = userRedisImp.findUserVo(UserVo.OBJECT_KEY);
+        System.out.println(userVo1.getEmail());*/
+        System.out.println(redisTemplate.opsForValue().get("user:160"));
+    }
+
+    @Test
+    public void test2() {
+        redisTemplate.delete(UserVo.OBJECT_KEY + 160);
     }
 }

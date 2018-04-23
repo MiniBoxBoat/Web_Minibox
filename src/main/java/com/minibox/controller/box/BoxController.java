@@ -28,13 +28,13 @@ public class BoxController {
     @Autowired
     private BoxService boxService;
 
-    @PostMapping("showUserUsingBoxes.do")
+    @GetMapping("showUserUsingBoxes.do")
     public ResponseEntity<List<BoxVo>> showUserUsingBoxes(String taken) {
         List<BoxVo> boxes = boxService.getUsingBoxes(taken);
         return new ResponseEntity<>(200, SUCCESS, boxes);
     }
 
-    @PostMapping("showUserReservingBoxes.do")
+    @GetMapping("showUserReservingBoxes.do")
     public ResponseEntity<List<BoxVo>> showReservingBoxes(String taken) {
         List<BoxVo> boxes = boxService.getReservingBoxes(taken);
         return new ResponseEntity<>(200, SUCCESS, boxes);

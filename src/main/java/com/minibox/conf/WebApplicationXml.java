@@ -45,7 +45,7 @@ public class WebApplicationXml extends AbstractAnnotationConfigDispatcherServlet
     //用于映射url
     @Override
     protected String[] getServletMappings() {
-        return new String[]{"*.do"};
+        return new String[]{"/"};
     }
 
     @Override

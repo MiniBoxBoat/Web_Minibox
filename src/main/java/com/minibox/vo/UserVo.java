@@ -2,7 +2,10 @@ package com.minibox.vo;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.io.Serializable;
 
 /**
  * @author MEI
@@ -10,7 +13,10 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class UserVo {
+@NoArgsConstructor
+public class UserVo implements Serializable{
+    public static String OBJECT_KEY="user:";
+
     private int userId;
     private String userName="";
     private String phoneNumber="";
