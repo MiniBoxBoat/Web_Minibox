@@ -10,6 +10,7 @@ public class ExceptionMessage {
     public static final String RESOURCE_NOT_FOUND= "资源不存在";
 
     /*userService*/
+    public static final String USER_NOT_EXSTS = "用户不存在";
     public static final String USER_NAME_IS_USED = "用户名已经被注册过了";
     public static final String PHONE_NUMBER_IS_USED ="手机号已经被注册过了";
     public static final String USER_NAME_IS_TOO_LONG = "用户名不要超过十个字符";

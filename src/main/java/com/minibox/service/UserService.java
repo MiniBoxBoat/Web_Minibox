@@ -66,7 +66,7 @@ public class UserService {
     public UserVo checkUser(String phoneNumber, String password){
         checkPhoneNumberIsTrue(phoneNumber);
         UserPo user = userMapper.findUserByPhoneNumber(phoneNumber);
-        Objects.requireNonNull(user, RESOURCE_NOT_FOUND);
+        Objects.requireNonNull(user, USER_NOT_EXSTS);
         if (!user.getPassword().equals(password)){
             throw new ParameterException(PASSWORD_IS_WRONG);
         }
